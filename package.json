@@ -9,10 +9,12 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "ng-serve-noam-ip-10.0.0.6": "ng serve --host 10.0.0.6",
+    "publish-to-heroku": "git push heroku master -f",
     "start": "npm run server:execute",
     "server:execute": "node dist-server/src/app/server/server.js",
     "server:debug": "node --inspect --debug-brk dist-server/src/app/server/server.js",
     "server:build": "tsc -p tsconfig.server.json",
+    
     "server:build-watch": "tsc -p tsconfig.server.json --watch"
   },
   "private": true,
