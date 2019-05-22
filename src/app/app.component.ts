@@ -65,7 +65,8 @@ export class AppComponent implements OnInit {
 
   async send() {
     this.throttle.DoIt();
-
+    this.messageHistory.push(this.currentMessage);
+    localStorage.setItem(this.storageKey, JSON.stringify(this.messageHistory));
     this.currentMessage = {
       text: '',
       translatedText: '',
