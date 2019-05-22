@@ -1,12 +1,31 @@
-<textarea [(ngModel)]="text" (keyup)="textChanging()">
-
-</textarea>
-<br>
-<div style="white-space: pre-wrap">
-{{otherText.text}}
-
-
-    {{otherText.translatedText}}
+<div class="container">
+    <div>
+        your name: <input [(ngModel)]="userName">
     </div>
-    
-<router-outlet></router-outlet>
+
+    <div class="chat-history-div">
+        1234
+
+        <div *ngFor="let m of messageHistory" class="message-line" [style.text-align]="messageAlign(m)">
+            <div class="message-text">
+                <span style="font-size: small">{{m.userName}}:</span><br>
+                <span>{{m.text}}</span> <br>
+                <span>{{m.translatedText}}</span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="input-div">
+        <div>
+            <textarea [(ngModel)]="text" (keyup)="textChanging()" class="text-input"></textarea>
+            <br>
+
+            <button (click)="send()">Send </button>
+            {{currentId}}
+        </div>
+        
+        <div class="current-translated">this is my translated text </div>
+    </div>
+</div>

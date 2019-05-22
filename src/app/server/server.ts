@@ -68,14 +68,27 @@ app.post('/api/authenticate', (req, res) => {
         res.json({ ok: true });
     }
 });
+let id = 0;
+app.get('/api/newId', (req, res) => {
+    res.json({ id: id++ });
+});
 app.post('/api/test', async (req, result) => {
     let x = req.body.text;
-
-    request("https://www.googleapis.com/language/translate/v2?key=" + process.env.google_key + "&source=en&target=he&format=text", {
+    let id  =req.body.id;
+    let userName= req.body.userName;
+    let isEnglish = req.body.isEnglish;
+    let source = "es";
+    let target = "en";
+    if (isEnglish)
+    {
+        target = source;
+        source = 'en';
+    }
+    request("https://www.googleapis.com/language/translate/v2?key=" + process.env.google_key + "&source="+source+"&target="+target+"&format=text", {
         method: 'post',
         body: JSON.stringify({ q: x })
     }, (err, res, body) => {
-        let m = { text: x, translatedText: JSON.parse(body).data.translations[0].translatedText } as Message;
+        let m = { text: x, translatedText: JSON.parse(body).data.translations[0].translatedText,id:id,userName:userName } as Message;
 
         connection.forEach(y => y.write("data:" + JSON.stringify(m) + "\n\n"))
         result.json({ item: '123' });

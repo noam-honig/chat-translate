@@ -1,0 +1,45 @@
+.text-input{
+width:100%;
+}
+.chat-history-div{
+    background-color: lightgoldenrodyellow;
+    flex-grow: 1;
+}
+.container{
+    background-color: lightblue;
+    height:100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-div{
+display:flex;
+flex-direction: row;
+}
+.input-div div{
+    flex-grow: 1;
+    padding-right:10px;
+}
+.message-line{
+    white-space: pre-wrap;
+    background-color: lightpink;
+    
+}
+.message-text{
+    display:inline-block;
+    width:80%;
+    background-color: aliceblue;
+    margin: 8px;
+    border: thin;
+    border-color: black;
+    border-style: solid;
+    border-radius: 11px;
+    padding: 3px;
+    font-family: wf_segoe-ui_normal,"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
+    font-weight: 400;
+    font-size: 1.2em;
+    line-height: 1.2em;
+}
+.current-translated{
+    white-space: pre-wrap;
+}

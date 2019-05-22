@@ -10,19 +10,42 @@ import { Message } from './model/message';
 export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.refreshEventListener(true);
+    this.messageHistory.push({ text: "test", translatedText: "translated", id: 1, userName: "noam", isEnglish: false });
+    this.messageHistory.push({ text: "test", translatedText: "translated", id: 1, userName: "noam", isEnglish: false });
+    this.messageHistory.push({ text: "test", translatedText: "translated", id: 1, userName: "noam", isEnglish: false });
   }
   constructor(private zone: NgZone, private http: HttpClient) {
 
   }
+  messageAlign(m: Message) {
+    if (m.userName == this.userName)
+      return 'end';
+    return '';
+  }
+  userName: string;
   text: string;
+  currentId: number = undefined;
   throttle = new myThrottle(500);
   async textChanging() {
-    this.throttle.do(async () => {
-      await this.http.post('/api/test', { text: this.text }).toPromise();
-    });
+    if (this.text) {
+      this.throttle.do(async () => {
+        if (!this.currentId) {
+          let x: any = await this.http.get('/api/newId').toPromise();
+          if (!this.currentId)
+            this.currentId = x.id;
+        }
+        let isEnglish = document.location.href.toLowerCase().endsWith('en=y');
+        await this.http.post('/api/test', { text: this.text, id: this.currentId, userName: this.userName, isEnglish: isEnglish }).toPromise();
+      });
+    }
   }
-  otherText: Message;
-  
+  send() {
+    this.text = '';
+    this.currentId = undefined;
+  }
+
+  messageHistory: Message[] = [];
+
   title = 'chat-translate';
   eventSource: any;/*EventSource*/
   refreshEventListener(enable: boolean) {
@@ -41,8 +64,16 @@ export class AppComponent implements OnInit {
           source.onmessage = e => {
 
             this.zone.run(() => {
-              this.otherText = JSON.parse(e.data);
-              console.log(this.otherText);
+              let message: Message = JSON.parse(e.data)
+              let m = this.messageHistory.find(x => x.id == message.id);
+              if (m) {
+                m.text = message.text;
+                m.translatedText = message.translatedText;
+              }
+              else
+                this.messageHistory.push(message);
+
+
             });
           };
           let x = this;
@@ -54,6 +85,7 @@ export class AppComponent implements OnInit {
       }
     }
   }
+
 }
 
 export class myThrottle {
