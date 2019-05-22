@@ -68,30 +68,42 @@ app.post('/api/authenticate', (req, res) => {
         res.json({ ok: true });
     }
 });
+let translationLanguage = 'es';
 let id = 0;
 app.get('/api/newId', (req, res) => {
     res.json({ id: id++ });
 });
+app.get('/api/lang', (req, res) => {
+    if (req.query.set) {
+        translationLanguage = req.query.set;
+    }
+    res.json({ lang: translationLanguage });
+});
 app.post('/api/test', async (req, result) => {
-    let message :Message= req.body.message;
-    
-    let source = "es";
+    let message: Message = req.body.message;
+
+    let source = translationLanguage;
     let target = "en";
-    if (message. isEnglish)
-    {
+    if (message.isEnglish) {
         target = source;
         source = 'en';
     }
-    request("https://www.googleapis.com/language/translate/v2?key=" + process.env.google_key + "&source="+source+"&target="+target+"&format=text", {
-        method: 'post',
-        body: JSON.stringify({ q: message.text })
-    }, (err, res, body) => {
-        message.translatedText = JSON.parse(body).data.translations[0].translatedText;
-        
+    try {
+        request("https://www.googleapis.com/language/translate/v2?key=" + process.env.google_key + "&source=" + source + "&target=" + target + "&format=text", {
+            method: 'post',
+            body: JSON.stringify({ q: message.text })
+        }, (err, res, body) => {
+            message.translatedText = JSON.parse(body).data.translations[0].translatedText;
 
-        connection.forEach(y => y.write("data:" + JSON.stringify(message) + "\n\n"))
-        result.json({ item: '123' });
-    });
+
+            connection.forEach(y => y.write("data:" + JSON.stringify(message) + "\n\n"))
+            result.json({ item: '123' });
+        });
+    }
+    catch (err) {
+        result.sendStatus(500);
+        result.json(err);
+    }
 
 
 
