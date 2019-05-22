@@ -73,24 +73,23 @@ app.get('/api/newId', (req, res) => {
     res.json({ id: id++ });
 });
 app.post('/api/test', async (req, result) => {
-    let x = req.body.text;
-    let id  =req.body.id;
-    let userName= req.body.userName;
-    let isEnglish = req.body.isEnglish;
+    let message :Message= req.body.message;
+    
     let source = "es";
     let target = "en";
-    if (isEnglish)
+    if (message. isEnglish)
     {
         target = source;
         source = 'en';
     }
     request("https://www.googleapis.com/language/translate/v2?key=" + process.env.google_key + "&source="+source+"&target="+target+"&format=text", {
         method: 'post',
-        body: JSON.stringify({ q: x })
+        body: JSON.stringify({ q: message.text })
     }, (err, res, body) => {
-        let m = { text: x, translatedText: JSON.parse(body).data.translations[0].translatedText,id:id,userName:userName } as Message;
+        message.translatedText = JSON.parse(body).data.translations[0].translatedText;
+        
 
-        connection.forEach(y => y.write("data:" + JSON.stringify(m) + "\n\n"))
+        connection.forEach(y => y.write("data:" + JSON.stringify(message) + "\n\n"))
         result.json({ item: '123' });
     });
 

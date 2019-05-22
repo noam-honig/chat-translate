@@ -10,38 +10,63 @@ import { Message } from './model/message';
 export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.refreshEventListener(true);
-    this.messageHistory.push({ text: "test", translatedText: "translated", id: 1, userName: "noam", isEnglish: false });
-    this.messageHistory.push({ text: "test", translatedText: "translated", id: 1, userName: "noam", isEnglish: false });
-    this.messageHistory.push({ text: "test", translatedText: "translated", id: 1, userName: "noam", isEnglish: false });
+    this.currentMessage.isEnglish = document.location.href.toLowerCase().endsWith('en=y')
+    this.currentMessage.userName = this.currentMessage.isEnglish?"Noam":"Guest";
+    let o = new MutationObserver(m =>
+      {
+        let d = document.getElementById("chat-history");
+        d.scrollTop = d.scrollHeight;
+          });
+      o.observe(document.getElementById("chat-history"), {childList:true});
   }
   constructor(private zone: NgZone, private http: HttpClient) {
 
   }
   messageAlign(m: Message) {
-    if (m.userName == this.userName)
+    if (m.userName == this.currentMessage.userName)
       return 'end';
     return '';
   }
-  userName: string;
-  text: string;
-  currentId: number = undefined;
+
+
+
+  currentMessage: Message = { text: '', translatedText: '', id: undefined, userName: undefined, isEnglish: undefined };
   throttle = new myThrottle(500);
-  async textChanging() {
-    if (this.text) {
+  async textChanging(e) {
+
+    let  textArea = e.target;
+  textArea.style.overflow = 'hidden';
+  textArea.style.height = '0px';
+  textArea.style.height = textArea.scrollHeight + 'px';
+
+    if (this.currentMessage.text) {
       this.throttle.do(async () => {
-        if (!this.currentId) {
+        if (!this.currentMessage.id) {
           let x: any = await this.http.get('/api/newId').toPromise();
-          if (!this.currentId)
-            this.currentId = x.id;
+          if (!this.currentMessage.id)
+            this.currentMessage.id = x.id;
         }
-        let isEnglish = document.location.href.toLowerCase().endsWith('en=y');
-        await this.http.post('/api/test', { text: this.text, id: this.currentId, userName: this.userName, isEnglish: isEnglish }).toPromise();
+        
+        await this.http.post('/api/test', { message: this.currentMessage }).toPromise();
       });
     }
   }
+
+  async keyPress(event) {
+    if (event.ctrlKey && event.code == "Enter")
+      this.send();
+  }
+
+
   send() {
-    this.text = '';
-    this.currentId = undefined;
+    this.messageHistory.push(this.currentMessage);
+    this.currentMessage = {
+      text: '',
+      translatedText: '',
+      userName: this.currentMessage.userName,
+      isEnglish: this.currentMessage.isEnglish,
+      id: undefined
+    };
   }
 
   messageHistory: Message[] = [];
@@ -64,14 +89,17 @@ export class AppComponent implements OnInit {
           source.onmessage = e => {
 
             this.zone.run(() => {
-              let message: Message = JSON.parse(e.data)
-              let m = this.messageHistory.find(x => x.id == message.id);
-              if (m) {
-                m.text = message.text;
-                m.translatedText = message.translatedText;
-              }
-              else
+              let message: Message = JSON.parse(e.data);
+              if (message.id == this.currentMessage.id) {
+                this.currentMessage.translatedText = message.translatedText;
+              } else {
+                let i = this.messageHistory.findIndex(x => x.id == message.id);
+                if (i >= 0) {
+                  this.messageHistory.splice(i, 1);
+                }
+
                 this.messageHistory.push(message);
+              }
 
 
             });
@@ -85,7 +113,6 @@ export class AppComponent implements OnInit {
       }
     }
   }
-
 }
 
 export class myThrottle {

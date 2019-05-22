@@ -1,9 +1,19 @@
 .text-input{
-width:100%;
+width:90%;
+margin: 8px;
+border: thin;
+border-color: black;
+border-style: solid;
+border-radius: 11px;
+padding: 8px;
+font-weight: 400;
+font-size: 1.2em;
+line-height: 1.2em;
 }
 .chat-history-div{
     background-color: lightgoldenrodyellow;
     flex-grow: 1;
+    overflow-y: auto;
 }
 .container{
     background-color: lightblue;
@@ -18,7 +28,6 @@ flex-direction: row;
 }
 .input-div div{
     flex-grow: 1;
-    padding-right:10px;
 }
 .message-line{
     white-space: pre-wrap;
@@ -26,6 +35,7 @@ flex-direction: row;
     
 }
 .message-text{
+    text-align:left;
     display:inline-block;
     width:80%;
     background-color: aliceblue;
@@ -35,11 +45,11 @@ flex-direction: row;
     border-style: solid;
     border-radius: 11px;
     padding: 3px;
-    font-family: wf_segoe-ui_normal,"Segoe UI",Tahoma,Geneva,Verdana,sans-serif;
     font-weight: 400;
     font-size: 1.2em;
     line-height: 1.2em;
 }
 .current-translated{
     white-space: pre-wrap;
+    margin: 8px;
 }
