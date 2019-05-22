@@ -29,7 +29,7 @@ if (!process.env.DISABLE_HTTPS)
     app.use(secure);
 
 
-app.use(express.static('dist'));
+app.use(express.static('dist/chat-translate'));
 app.use(bodyParser.json())
 
 
