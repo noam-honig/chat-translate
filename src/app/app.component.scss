@@ -1,19 +1,17 @@
 .text-input{
 width:90%;
+font-family: 'Roboto',arial,sans-serif;
 margin: 8px;
-border: thin;
-border-color: black;
-border-style: solid;
-border-radius: 11px;
 padding: 8px;
 font-weight: 400;
-font-size: 1.2em;
+font-size: 19px;
 line-height: 1.2em;
 }
 .chat-history-div{
     background-color: lightgoldenrodyellow;
     flex-grow: 1;
     overflow-y: auto;
+    align-items: flex-end;
 }
 .container{
     background-color: lightblue;
@@ -31,7 +29,6 @@ flex-direction: row;
 }
 .message-line{
     white-space: pre-wrap;
-    background-color: lightpink;
     
 }
 .message-text{
@@ -51,5 +48,31 @@ flex-direction: row;
 }
 .current-translated{
     white-space: pre-wrap;
-    margin: 8px;
+    width: 50%;
+    display: inline-block;
+    border: 0px;
+    border-style: solid;
+    margin: -1px;
+    
+    height: 100%;
+}
+@media only screen and (max-width: 767px){
+.current-translated{
+    
+    border-top-width: 1px;
+    border-color: lightgray;
+    width:100%;
+}}
+
+
+@media only screen and (min-width: 768px)
+{.current-translated{
+    vertical-align: top;
+    border-left-width: 1px;
+    border-color: lightgray;
+}
+    .bubble-part{
+        width:50%;
+        display:inline-block;
+    }
 }

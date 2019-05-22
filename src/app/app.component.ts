@@ -8,22 +8,25 @@ import { Message } from './model/message';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+  storageKey = new Date().toDateString();
   ngOnInit(): void {
     this.refreshEventListener(true);
     this.currentMessage.isEnglish = document.location.href.toLowerCase().endsWith('en=y')
-    this.currentMessage.userName = this.currentMessage.isEnglish?"Noam":"Guest";
-    let o = new MutationObserver(m =>
-      {
-        let d = document.getElementById("chat-history");
-        d.scrollTop = d.scrollHeight;
-          });
-      o.observe(document.getElementById("chat-history"), {childList:true});
+    this.currentMessage.userName = this.currentMessage.isEnglish ? "Noam" : "Guest";
+    let o = new MutationObserver(m => {
+      let d = document.getElementById("chat-history");
+      d.scrollTop = d.scrollHeight;
+    });
+    o.observe(document.getElementById("chat-history"), { childList: true });
+    let x = localStorage.getItem(this.storageKey);
+    if (x)
+      this.messageHistory = JSON.parse(x);
   }
   constructor(private zone: NgZone, private http: HttpClient) {
 
   }
   messageAlign(m: Message) {
-    if (m.userName == this.currentMessage.userName)
+    if (!m.isEnglish)
       return 'end';
     return '';
   }
@@ -34,20 +37,22 @@ export class AppComponent implements OnInit {
   throttle = new myThrottle(500);
   async textChanging(e) {
 
-    let  textArea = e.target;
-  textArea.style.overflow = 'hidden';
-  textArea.style.height = '0px';
-  textArea.style.height = textArea.scrollHeight + 'px';
+    let textArea = e.target;
+    textArea.style.overflow = 'hidden';
+    textArea.style.height = '0px';
+    textArea.style.height = textArea.scrollHeight + 'px';
 
-    if (this.currentMessage.text) {
+    let m = this.currentMessage;
+
+    if (m.text) {
       this.throttle.do(async () => {
-        if (!this.currentMessage.id) {
+        if (!m.id) {
           let x: any = await this.http.get('/api/newId').toPromise();
-          if (!this.currentMessage.id)
-            this.currentMessage.id = x.id;
+          if (!m.id)
+            m.id = x.id;
         }
-        
-        await this.http.post('/api/test', { message: this.currentMessage }).toPromise();
+
+        await this.http.post('/api/test', { message: m }).toPromise();
       });
     }
   }
@@ -58,8 +63,9 @@ export class AppComponent implements OnInit {
   }
 
 
-  send() {
-    this.messageHistory.push(this.currentMessage);
+  async send() {
+    this.throttle.DoIt();
+
     this.currentMessage = {
       text: '',
       translatedText: '',
@@ -100,7 +106,7 @@ export class AppComponent implements OnInit {
 
                 this.messageHistory.push(message);
               }
-
+              localStorage.setItem(this.storageKey, JSON.stringify(this.messageHistory));
 
             });
           };
@@ -113,7 +119,11 @@ export class AppComponent implements OnInit {
       }
     }
   }
+  getInviteUrl() {
+    return document.location.hostname;
+  }
 }
+
 
 export class myThrottle {
   constructor(private ms: number) {
@@ -132,13 +142,19 @@ export class myThrottle {
       if (!this.runNext) {
         this.runNext = what;
         setTimeout(() => {
-          let x = this.runNext;
-          this.runNext = undefined;
-          this.lastRun = new Date().valueOf();
-          x();
+          this.DoIt();
         }, this.lastRun + this.ms - current);
       }
       else this.runNext = what;
+    }
+  }
+
+  public DoIt() {
+    if (this.runNext) {
+      let x = this.runNext;
+      this.runNext = undefined;
+      this.lastRun = new Date().valueOf();
+      x();
     }
   }
 }

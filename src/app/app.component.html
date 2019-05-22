@@ -1,29 +1,30 @@
 <div class="container">
     <div>
-        your name: <input [(ngModel)]="currentMessage.userName">
+        your name: <input [(ngModel)]="currentMessage.userName">,Use this url to join: <strong> {{getInviteUrl()}}</strong>
     </div>
+    <div class="chat-history-div" style="flex-grow: 1000"></div>
 
-    <div id="chat-history" class="chat-history-div" conten>
+    <div id="chat-history" class="chat-history-div">
         <div *ngFor="let m of messageHistory" class="message-line" [style.text-align]="messageAlign(m)">
             <div class="message-text">
                 <span style="font-size: small">{{m.userName}}:</span><br>
-                <span>{{m.text}}</span> <br>
-                <span>{{m.translatedText}}</span>
+                <div>
+                    <div class="bubble-part">{{m.text}}</div>
+                    <div class="bubble-part"class="current-translated">{{m.translatedText}}</div>
+                </div>
             </div>
-
         </div>
 
     </div>
 
-    <div class="input-div">
-        <div>
-            <textarea [(ngModel)]="currentMessage.text" (keyup)="textChanging($event)" class="text-input" (keypress)="keyPress($event)"></textarea>
-            <br>
-
-            <button (click)="send()">Send </button>
-            <span style="font-size: small">(or press [Ctrl]+[Enter] to send)</span>
-        </div>
-        
-        <div class="current-translated">{{currentMessage.translatedText}}</div>
+    <div class="message-text">
+                    <div class="bubble-part">
+                        <textarea [(ngModel)]="currentMessage.text" (keyup)="textChanging($event)" class="text-input" (keypress)="keyPress($event)"></textarea>
+                    </div>
+            <div class="current-translated bubble-part">{{currentMessage.translatedText}}</div>
     </div>
+    <div>
+    <button (click)="send()">Send </button>
+    <span style="font-size: small">(or press [Ctrl]+[Enter] to send)</span>
+</div>
 </div>
