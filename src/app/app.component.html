@@ -1,5 +1,12 @@
 <textarea [(ngModel)]="text" (keyup)="textChanging()">
 
 </textarea>
-<br>{{otherText}}
+<br>
+<div style="white-space: pre-wrap">
+{{otherText.text}}
+
+
+    {{otherText.translatedText}}
+    </div>
+    
 <router-outlet></router-outlet>

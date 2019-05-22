@@ -6,6 +6,20 @@ import * as secure from 'express-force-https';
 import { config } from 'dotenv';
 import '../../stam';
 import * as bodyParser from 'body-parser';
+import { Message } from '../model/message';
+import * as https from 'https';
+
+import * as request from 'request';
+
+
+let text = 'hello world';
+let target = "ru";
+let source = "en";
+
+
+
+
+
 
 config();
 let app = express();
@@ -18,24 +32,25 @@ if (!process.env.DISABLE_HTTPS)
 app.use(express.static('dist'));
 app.use(bodyParser.json())
 
+
 let connection: Response[] = [];
 let tempConnections: any = {};
 app.get('/api/stream', (req, res) => {
 
     res.writeHead(200, {
-        
+
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive'
     });
     let key = new Date().toISOString();
-    
+
     tempConnections[key] = () => {
         connection.push(res);
         tempConnections[key] = undefined;
 
     };
-    console.log('registered to stream '+key);
+    console.log('registered to stream ' + key);
     res.write("event:authenticate\ndata:" + key + "\n\n");
 
     req.on("close", () => {
@@ -50,13 +65,24 @@ app.post('/api/authenticate', (req, res) => {
     let x = tempConnections[req.body.key];
     if (x) {
         x();
-        res.json({ok:true});
+        res.json({ ok: true });
     }
 });
-app.post('/api/test', (req, res) => {
+app.post('/api/test', async (req, result) => {
     let x = req.body.text;
-    connection.forEach(y => y.write("data:" + x + "\n\n"))
-    res.json({ item: '123' });
+
+    request("https://www.googleapis.com/language/translate/v2?key=" + process.env.google_key + "&source=en&target=he&format=text", {
+        method: 'post',
+        body: JSON.stringify({ q: x })
+    }, (err, res, body) => {
+        let m = { text: x, translatedText: JSON.parse(body).data.translations[0].translatedText } as Message;
+
+        connection.forEach(y => y.write("data:" + JSON.stringify(m) + "\n\n"))
+        result.json({ item: '123' });
+    });
+
+
+
 });
 
 app.listen(port);
