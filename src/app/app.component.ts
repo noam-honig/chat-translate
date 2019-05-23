@@ -1,4 +1,4 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, NgZone, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Message } from './model/message';
 
@@ -9,9 +9,19 @@ import { Message } from './model/message';
 })
 export class AppComponent implements OnInit {
   storageKey = new Date().toDateString();
-  ngOnInit(): void {
+  microphoneLang: string;
+  async ngOnInit() {
+
+
+    let lang: any = await this.http.get('/api/lang').toPromise();
+    this.microphoneLang = lang.lang;
+
+
     this.refreshEventListener(true);
     this.currentMessage.isEnglish = document.location.href.toLowerCase().endsWith('en=y')
+    if (this.currentMessage.isEnglish) {
+      this.microphoneLang = 'en-us';
+    }
     this.currentMessage.userName = this.currentMessage.isEnglish ? "Noam" : "Guest";
     let o = new MutationObserver(m => {
       let d = document.getElementById("chat-history");
@@ -21,6 +31,82 @@ export class AppComponent implements OnInit {
     let x = localStorage.getItem(this.storageKey);
     if (x)
       this.messageHistory = JSON.parse(x);
+    if (!('webkitSpeechRecognition' in window)) {
+
+    } else {
+      const webkitSpeechRecognition: any = window['webkitSpeechRecognition'];
+      var recognition = new webkitSpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        this.microphoneText = '';
+        this.lastFinalMicrophoneResult = -1;
+      }
+      recognition.onresult = (event) => {
+        let i = 0;
+        let old = '';
+        let newFinalText = '';
+        let interm = '';
+        for (const res of event.results) {
+          let j = 0;
+
+          for (const alt of res) {
+            if (res.isFinal) {
+              if (i > this.lastFinalMicrophoneResult) {
+                newFinalText += alt.transcript;
+                this.lastFinalMicrophoneResult = i;
+              } else {
+                old += alt.transcript;
+              }
+            }
+            else
+              interm += alt.transcript;//, res.isFinal, i, j++);
+
+          }
+          i++;
+        }
+        console.log({ old, current: newFinalText, interm });
+        this.zone.run(() => {
+          if (newFinalText) {
+            if (this.currentMessage.text)
+              this.currentMessage.text += '\n';
+            this.currentMessage.text += newFinalText.trim();
+
+
+          }
+          this.microphoneText = interm
+          setTimeout(() => {
+            this.textChanging();
+          }, 100);
+
+        });
+
+
+      }
+      recognition.onerror = (event) => {
+        console.log("on error", event);
+      }
+      recognition.onend = () => { this.recording = false };
+      this.doStart = () => {
+        if (!this.recording) {
+          recognition.lang = this.microphoneLang;
+          recognition.start();
+          this.recording = true;
+        }
+        else {
+            recognition.stop();
+            this.recording = false;
+        }
+      };
+    }
+  }
+  microphoneText: string = '';
+  lastFinalMicrophoneResult = -1;
+  recording = false;
+  doStart: () => void = () => { };
+  startRecording() {
+    this.doStart();
   }
   constructor(private zone: NgZone, private http: HttpClient) {
 
@@ -32,29 +118,38 @@ export class AppComponent implements OnInit {
   }
 
 
-
+  @ViewChild('theArea') theArea;
   currentMessage: Message = { text: '', translatedText: '', id: undefined, userName: undefined, isEnglish: undefined };
   throttle = new myThrottle(500);
-  async textChanging(e) {
+  async textChanging() {
 
-    let textArea = e.target;
-    textArea.style.overflow = 'hidden';
-    textArea.style.height = '0px';
-    textArea.style.height = textArea.scrollHeight + 'px';
+    this.resizeTextArea();
 
     let m = this.currentMessage;
 
-    if (m.text) {
+    if (m.text || this.microphoneText) {
       this.throttle.do(async () => {
         if (!m.id) {
           let x: any = await this.http.get('/api/newId').toPromise();
           if (!m.id)
             m.id = x.id;
         }
-
+        m = Object.assign({}, m);
+        if (this.microphoneText) {
+          if (m.text)
+            m.text += '\n';
+          m.text += this.microphoneText;
+        }
         await this.http.post('/api/test', { message: m }).toPromise();
       });
     }
+  }
+
+  private resizeTextArea() {
+    let textArea = this.theArea.nativeElement;
+    textArea.style.overflow = 'hidden';
+    textArea.style.height = '0px';
+    textArea.style.height = textArea.scrollHeight + 'px';
   }
 
   async keyPress(event) {
@@ -74,6 +169,7 @@ export class AppComponent implements OnInit {
       isEnglish: this.currentMessage.isEnglish,
       id: undefined
     };
+    this.resizeTextArea();
   }
 
   messageHistory: Message[] = [];

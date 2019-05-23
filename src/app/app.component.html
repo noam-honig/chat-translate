@@ -21,16 +21,17 @@
         </div>
 
     </div>
-
     <div class="message-text">
         <div class="bubble-part">
-            <textarea [(ngModel)]="currentMessage.text" (keyup)="textChanging($event)" class="text-input"
+            <textarea #theArea [(ngModel)]="currentMessage.text" (keyup)="textChanging($event)" class="text-input"
                 (keypress)="keyPress($event)"></textarea>
+                {{microphoneText}}
         </div>
         <div class="current-translated bubble-part">{{currentMessage.translatedText}}</div>
     </div>
     <div>
         <button (click)="send()">Send </button>
+        <button (click)="startRecording()">{{recording?"stop recording":"record" }}</button>
         <span style="font-size: small">(or press [Ctrl]+[Enter] to send)</span>
     </div>
 </div>
