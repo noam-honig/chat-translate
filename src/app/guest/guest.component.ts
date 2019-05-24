@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { ConverseComponent } from '../converse/converse.component';
+import { ConversationInfo } from '../model/message';
 
 @Component({
   selector: 'app-guest',
@@ -22,11 +23,18 @@ export class GuestComponent implements OnInit {
   @ViewChild("converse") converse: ConverseComponent;
   async joinConversation() {
 
-    let info = <any>(await this.http.get('api/info?id=' + this.currentRoute.snapshot.paramMap.get('id')).toPromise());
-    if (info) {
-      info.username = this.username;
-      this.converse.init(info,false);
-      this.hide = !this.hide;
+    try {
+      let info: ConversationInfo = <any>(await this.http.get('api/info?id=' + this.currentRoute.snapshot.paramMap.get('id')).toPromise());
+      if (info && info.hostLanguage) {
+        info.username = this.username;
+        this.converse.init(info, false);
+        this.hide = !this.hide;
+      }
+      else {
+        
+      }
+    } catch{ 
+      alert("Something is wrong - please try again in a minute or two");
     }
   }
 }
