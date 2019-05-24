@@ -22,7 +22,7 @@
     </div> 
     <div class="message-text">
         <div class="bubble-part">
-            <textarea #theArea [(ngModel)]="currentMessage.text" (keyup)="textChanging($event)" class="text-input"
+            <textarea #theArea [(ngModel)]="currentMessage.text" (keyup)="textChanging()" class="text-input"
                 (keypress)="keyPress($event)"></textarea>
             {{microphoneText}}
         </div>
