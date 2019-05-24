@@ -292,7 +292,7 @@ export class ConverseComponent {
   }
   playTranslation: boolean = false;
   speak() {
-    this.playTranslation = true;
+    this.playTranslation = !this.playTranslation;
   }
 }
 

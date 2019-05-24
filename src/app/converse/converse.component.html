@@ -23,17 +23,17 @@
     </div> 
     <div class="message-text">
         <div class="bubble-part">
-            <textarea #theArea [(ngModel)]="currentMessage.text" (keyup)="textChanging()" class="text-input"
+            <textarea #theArea [(ngModel)]="currentMessage.text" (keyup)="textChanging()" class="text-input" placeholder="Type a message"
                 (keypress)="keyPress($event)"></textarea>
             {{microphoneText}}
         </div>
         <div class="current-translated bubble-part">{{currentMessage.translatedText}}</div>
     </div>
     <div>
-        <button (click)="send()">Send </button>
-        <button (click)="startRecording()">{{recording?"stop recording":"record" }}</button>
+        <button mat-icon-button (click)="send()"  matTooltip="Click me to send the message"><mat-icon >send</mat-icon> </button>
+        <button mat-icon-button (click)="startRecording()" [class.pressed]="recording"  matTooltip="Click me to anable the microphone and speach to text"><mat-icon >mic</mat-icon></button>
         <span style="font-size: small">(or press [Ctrl]+[Enter] to send)</span>
-        <button (click)="switchLanguage()">{{currentMessage.fromLanguage}} <=> {{currentMessage.toLanguage}} </button>
-        <button (click)="speak()">Speak</button>
+        <button mat-button (click)="switchLanguage()">{{currentMessage.fromLanguage}} <=> {{currentMessage.toLanguage}} </button>
+        <button mat-icon-button (click)="speak()" [class.pressed]="playTranslation" matTooltip="Click me to hear the translated text"><mat-icon >volume_up</mat-icon></button>
     </div>
 </div>
