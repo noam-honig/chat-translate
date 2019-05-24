@@ -48,12 +48,17 @@ export class ConverseComponent {
       this.webkitSpeechRecognitionTypeForNew = window['webkitSpeechRecognition'];
 
     }
+    setTimeout(() => {
+      this.theArea.nativeElement.focus();
+
+    }, 100);
+
   }
   microphoneText: string = '';
 
   recording = false;
   stopRecording = () => { };
-  startRecording() {
+  toggleRecording() {
     if (!this.webkitSpeechRecognitionTypeForNew)
       return;
     if (this.recording) {
@@ -105,6 +110,7 @@ export class ConverseComponent {
           this.microphoneText = interm
         setTimeout(() => {
           this.translateMessage(m, interm);
+          this.resizeTextArea();
         }, 100);
 
       });
@@ -177,6 +183,8 @@ export class ConverseComponent {
     textArea.style.overflow = 'hidden';
     textArea.style.height = '0px';
     textArea.style.height = textArea.scrollHeight + 'px';
+    if (textArea.style.height < textArea.style.lineHeight)
+      textArea.style.height = textArea.style.lineHeight;
   }
 
   async keyPress(event) {
@@ -191,8 +199,8 @@ export class ConverseComponent {
     this.currentMessage.fromLanguage = this.currentMessage.toLanguage;
     this.currentMessage.toLanguage = temp;
     if (this.recording) {
-      this.startRecording();
-      this.startRecording();
+      this.toggleRecording();
+      this.toggleRecording();
     }
   }
 
@@ -210,8 +218,8 @@ export class ConverseComponent {
     this.currentMessage.id = undefined;
     this.currentMessage.isFinal = false;
     if (this.recording) {
-      this.startRecording();
-      this.startRecording();
+      this.toggleRecording();
+      this.toggleRecording();
     }
 
     this.resizeTextArea();
@@ -251,18 +259,9 @@ export class ConverseComponent {
                   this.messageHistory.push(message);
 
                 }
-                if (message.isFinal && this.lastPlayedId != message.id&&this.playTranslation) {
+                if (message.isFinal && this.lastPlayedId != message.id && this.playTranslation) {
                   this.lastPlayedId = message.id;
-                  try {
-
-                    let s = new SpeechSynthesisUtterance();
-                    s.lang = message.toLanguage;
-                    s.text = message.translatedText;
-                    window.speechSynthesis.speak(s);
-                  }
-                  catch (err) {
-                    console.error(err);
-                  }
+                  this.doSpeak(message);
                 }
               }
               localStorage.setItem(this.storageKey, JSON.stringify(this.messageHistory));
@@ -277,6 +276,30 @@ export class ConverseComponent {
           });
         });
       }
+    }
+  }
+
+  doSpeak(message: Message) {
+    try {
+
+      let s = new SpeechSynthesisUtterance();
+      s.lang = message.toLanguage;
+      s.text = message.translatedText;
+      let recording = this.recording;
+      if (recording) {
+        s.onstart = () => {
+          this.toggleRecording();
+        };
+        s.onend = () => {
+          this.toggleRecording();
+        };
+
+      }
+      window.speechSynthesis.speak(s);
+
+    }
+    catch (err) {
+      console.error(err);
     }
   }
   showMessageName(m: Message, i: number) {
