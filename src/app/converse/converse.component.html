@@ -1,6 +1,7 @@
 <div class="container">
     <div>
-       {{getInviteUrl()}}
+        Link to join: <a [attr.href]="getInviteUrl()" target="_blank">{{getShortInviteUrl()}}</a>
+       
     </div>
     <div class="chat-history-div" style="flex-grow: 1000;border-top:1px;
     border-top-style:solid;

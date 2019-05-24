@@ -259,7 +259,10 @@ export class ConverseComponent  {
     }
   }
   getInviteUrl() {
-    return document.location.hostname+'/'+this.currentMessage.conversation;
+    return document.location.origin+'/'+this.currentMessage.conversation;
+  }
+  getShortInviteUrl() {
+    return document.location.host+'/'+this.currentMessage.conversation;
   }
 }
 
