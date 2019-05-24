@@ -1,0 +1,12 @@
+<mat-card class="card" *ngIf="hide">
+  <mat-card-header>
+    <mat-card-title>Join Conversation</mat-card-title>
+  </mat-card-header>
+  <div class="example-container">
+    <mat-form-field>
+      <input matInput placeholder="What is your name?" [(ngModel)]="username">
+    </mat-form-field>
+    <button mat-raised-button color="primary" [disabled]="disableConversation()" (click)="joinConversation()">Join Conversation</button>
+  </div>
+</mat-card>
+<app-converse #converse [hidden]="hide"></app-converse>

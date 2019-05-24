@@ -6,7 +6,7 @@ import * as secure from 'express-force-https';
 import { config } from 'dotenv';
 import '../../stam';
 import * as bodyParser from 'body-parser';
-import { Message } from '../model/message';
+import { Message, ConversationInfo } from '../model/message';
 import * as https from 'https';
 
 import * as request from 'request';
@@ -24,7 +24,7 @@ app.use(express.static('dist/chat-translate'));
 app.use(bodyParser.json())
 
 
-let connection: Response[] = [];
+
 let tempConnections: any = {};
 app.get('/api/stream', (req, res) => {
 
@@ -36,8 +36,16 @@ app.get('/api/stream', (req, res) => {
     });
     let key = new Date().toISOString();
 
-    tempConnections[key] = () => {
-        connection.push(res);
+    tempConnections[key] = (conversation) => {
+        let c = activeConversations.get(conversation);
+        if (!c) {
+            activeConversations.set(conversation,c= new ActiveConversation({
+                id: conversation, guestLanguage: undefined, hostLanguage: undefined, username: undefined
+            }));
+
+        }
+        c.addConnection(res);
+
         tempConnections[key] = undefined;
 
     };
@@ -46,16 +54,15 @@ app.get('/api/stream', (req, res) => {
 
     req.on("close", () => {
         tempConnections[key] = undefined;
-        let i = connection.indexOf(res);
-        if (i >= 0)
-            connection.splice(i, 1);
+        activeConversations.forEach(x => { x.removeConnection(res) });
+
     });
 });
 app.use(compression());
 app.post('/api/authenticate', (req, res) => {
     let x = tempConnections[req.body.key];
     if (x) {
-        x();
+        x(req.body.conversation);
         res.json({ ok: true });
     }
 });
@@ -69,6 +76,45 @@ app.get('/api/lang', (req, res) => {
         translationLanguage = req.query.set;
     }
     res.json({ lang: translationLanguage });
+});
+function makeid() {
+    var text = "";
+    var possible = "abcdefghijklmnopqrstuvwxyz0123456789";
+
+    for (var i = 0; i < 5; i++)
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
+}
+
+let activeConversations = new Map<string, ActiveConversation>();
+
+class ActiveConversation {
+    send(message: Message) {
+        this.connection.forEach(y => y.write("data:" + JSON.stringify(message) + "\n\n"))
+    }
+    removeConnection(res: Response) {
+        let i = this.connection.indexOf(res);
+        if (i >= 0)
+            this.connection.splice(i, 1);
+    }
+    connection: Response[] = [];
+    addConnection(res: Response) {
+        this.connection.push(res);
+    }
+    constructor(public info: ConversationInfo) {
+
+    }
+}
+app.get('/api/info', (req, res) => {
+    let id = req.query.id;
+    res.json(activeConversations.get(id).info);
+});
+app.post('/api/start', (req, res) => {
+    let info: ConversationInfo = req.body.info;
+    info.id = makeid();
+
+    activeConversations.set(info.id, new ActiveConversation(info));
+    res.json(info);
 });
 app.post('/api/test', async (req, result) => {
     let message: Message = req.body.message;
@@ -85,10 +131,17 @@ app.post('/api/test', async (req, result) => {
             let x = theBody.data;
             if (x)
                 message.translatedText = x.translations[0].translatedText;
-            else console.error(theBody,err);
+            else console.error(theBody, err);
 
+            let c = activeConversations.get(message.conversation);
+            if (!c) {
+                 activeConversations.set(message.conversation,c= new ActiveConversation({
+                    id: message.conversation, guestLanguage: message.presenter ? message.toLanguage : message.fromLanguage, hostLanguage: message.presenter ? message.fromLanguage : message.toLanguage, username: message.presenter ? message.userName : undefined
+                }));
 
-            connection.forEach(y => y.write("data:" + JSON.stringify(message) + "\n\n"))
+            }
+            c.send(message);
+
             result.json({ item: '123' });
         });
     }

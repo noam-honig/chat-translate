@@ -1,0 +1,22 @@
+<mat-card class="card">
+  <mat-card-header>
+    <mat-card-title>Start Conversation</mat-card-title>
+  </mat-card-header>
+  <div class="example-container">
+    <mat-form-field>
+      <input matInput placeholder="What is your name?" [(ngModel)]="start.username">
+    </mat-form-field>
+
+    <mat-form-field>
+      <mat-select placeholder="What is your Language?" [(ngModel)]="start.hostLanguage">
+        <mat-option *ngFor="let l of languages" value="{{l[1]}}">{{l[0]}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field>
+      <mat-select placeholder="What is your guest's Language?" [(ngModel)]="start.guestLanguage">
+        <mat-option *ngFor="let l of languages" value="{{l[1]}}">{{l[0]}}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button mat-raised-button color="primary" [disabled]="disableConversation()" (click)="startConversation()">Start Conversation</button>
+  </div>
+</mat-card>
