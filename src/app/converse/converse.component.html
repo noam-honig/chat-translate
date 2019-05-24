@@ -15,6 +15,10 @@
                 
                 <span>{{currentMessage.fromLanguage}} <mat-icon>swap_horiz</mat-icon> {{currentMessage.toLanguage}}</span>
             </button>
+            <button mat-menu-item (click)="newConversation()">
+                    <mat-icon >create</mat-icon>
+                    <span>Start new conversation</span>
+                </button>
            
         </mat-menu>
     <div class="chat-history-div" style="flex-grow: 1000;"></div>
@@ -41,7 +45,7 @@
     <div style="display:flex;align-items: center">
         <div class="message-text">
             <div class="bubble-part">
-                <textarea #theArea [(ngModel)]="currentMessage.text" (keyup)="textChanging()" class="text-input"
+                <textarea #theArea [(ngModel)]="currentMessage.text" (input)="textChanging()" class="text-input" 
                     placeholder="Type a message" (keypress)="keyPress($event)" mat-focus></textarea>
                 <span class="interm-microphone-text">{{microphoneText}}</span>
             </div>

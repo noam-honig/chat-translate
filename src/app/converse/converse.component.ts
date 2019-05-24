@@ -3,6 +3,7 @@ import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
 import { Message, ConversationInfo } from '../model/message';
 import { HttpClient } from '@angular/common/http';
 import { ConversationInfoService } from '../conversation-info.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-converse',
@@ -14,7 +15,9 @@ export class ConverseComponent {
 
 
 
-
+  newConversation(){
+    this.router.navigate(["/"]);
+  }
   webkitSpeechRecognitionTypeForNew: any;
   async init(info: ConversationInfo, host?: boolean) {
 
@@ -141,7 +144,7 @@ export class ConverseComponent {
 
 
   }
-  constructor(private zone: NgZone, private http: HttpClient) {
+  constructor(private zone: NgZone, private http: HttpClient,private router:Router) {
 
   }
   messageAlign(m: Message) {
