@@ -1,6 +1,8 @@
 <div class="container">
     <div class="title-bar">
-        <div> Link to join: <a [attr.href]="getInviteUrl()" target="_blank">{{getShortInviteUrl()}}</a></div>
+        <div> Copy join url: <a (click)="copyJoinLink($event)" style="color: -webkit-link;
+            cursor: pointer;
+            text-decoration: underline;">{{getShortInviteUrl()}}</a></div>
         <button mat-icon-button [matMenuTriggerFor]="menu">
             <mat-icon>more_vert</mat-icon>
         </button>

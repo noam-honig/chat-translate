@@ -4,6 +4,7 @@ import { Message, ConversationInfo } from '../model/message';
 import { HttpClient } from '@angular/common/http';
 import { ConversationInfoService } from '../conversation-info.service';
 import { Router } from '@angular/router';
+import * as copy from 'copy-to-clipboard';
 
 @Component({
   selector: 'app-converse',
@@ -12,10 +13,12 @@ import { Router } from '@angular/router';
 })
 export class ConverseComponent {
   storageKey = new Date().toDateString();
+  copyJoinLink() {
+    copy(this.getShortInviteUrl());
+  }
 
 
-
-  newConversation(){
+  newConversation() {
     this.router.navigate(["/"]);
   }
   webkitSpeechRecognitionTypeForNew: any;
@@ -58,8 +61,8 @@ export class ConverseComponent {
     }, 100);
 
   }
-  canRecord= false;
-  
+  canRecord = false;
+
   microphoneText: string = '';
 
   recording = false;
@@ -144,7 +147,7 @@ export class ConverseComponent {
 
 
   }
-  constructor(private zone: NgZone, private http: HttpClient,private router:Router) {
+  constructor(private zone: NgZone, private http: HttpClient, private router: Router) {
 
   }
   messageAlign(m: Message) {
@@ -217,7 +220,7 @@ export class ConverseComponent {
     this.translateMessage(this.currentMessage);
     this.throttle = new myThrottle(500);
     this.messageHistory.push(this.currentMessage);
-    
+
     this.currentMessage = Object.assign({}, this.currentMessage);
     this.currentMessage.text = '';
     this.currentMessage.translatedText = '';
