@@ -7,6 +7,7 @@ export interface Message {
     fromLanguage: string;
     toLanguage: string;
     conversation:string;
+    isFinal:boolean;
 }
 export interface ConversationInfo {
     id: string;

@@ -15,7 +15,7 @@
                 <span style="font-size: small" *ngIf="showMessageName(m,i)">{{m.userName}}:<br></span>
                 <div>
                     <div class="bubble-part">{{m.text}}</div>
-                    <div class="bubble-part" class="current-translated">{{m.translatedText}}</div>
+                    <div class="bubble-part" class="current-translated">{{m.translatedText}} </div>
                 </div>
             </div>
         </div>
@@ -34,5 +34,6 @@
         <button (click)="startRecording()">{{recording?"stop recording":"record" }}</button>
         <span style="font-size: small">(or press [Ctrl]+[Enter] to send)</span>
         <button (click)="switchLanguage()">{{currentMessage.fromLanguage}} <=> {{currentMessage.toLanguage}} </button>
+        <button (click)="speak()">Speak</button>
     </div>
 </div>

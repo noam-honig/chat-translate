@@ -39,7 +39,7 @@ app.get('/api/stream', (req, res) => {
     tempConnections[key] = (conversation) => {
         let c = activeConversations.get(conversation);
         if (!c) {
-            activeConversations.set(conversation,c= new ActiveConversation({
+            activeConversations.set(conversation, c = new ActiveConversation({
                 id: conversation, guestLanguage: undefined, hostLanguage: undefined, username: undefined
             }));
 
@@ -135,10 +135,15 @@ app.post('/api/test', async (req, result) => {
 
             let c = activeConversations.get(message.conversation);
             if (!c) {
-                 activeConversations.set(message.conversation,c= new ActiveConversation({
-                    id: message.conversation, guestLanguage: message.presenter ? message.toLanguage : message.fromLanguage, hostLanguage: message.presenter ? message.fromLanguage : message.toLanguage, username: message.presenter ? message.userName : undefined
+                activeConversations.set(message.conversation, c = new ActiveConversation({
+                    id: message.conversation, guestLanguage: undefined, hostLanguage: undefined, username: undefined
                 }));
 
+            }
+            if (message.presenter && !c.info.username) {
+                c.info.username = message.userName;
+                c.info.guestLanguage = message.toLanguage;
+                c.info.hostLanguage = message.fromLanguage;
             }
             c.send(message);
 

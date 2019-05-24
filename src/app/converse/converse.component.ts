@@ -92,7 +92,7 @@ export class ConverseComponent {
         }
         i++;
       }
-      console.log({ old, current: newFinalText, interm, id: m.id });
+      //console.log({ old, current: newFinalText, interm, id: m.id });
       this.zone.run(() => {
         if (newFinalText) {
           if (m.text)
@@ -143,7 +143,7 @@ export class ConverseComponent {
 
 
   @ViewChild('theArea') theArea;
-  currentMessage: Message = { text: '', translatedText: '', id: undefined, userName: undefined, presenter: undefined, fromLanguage: undefined, toLanguage: undefined, conversation: undefined };
+  currentMessage: Message = { text: '', translatedText: '', id: undefined, userName: undefined, presenter: undefined, fromLanguage: undefined, toLanguage: undefined, conversation: undefined, isFinal: false };
   throttle = new myThrottle(500);
   async textChanging() {
 
@@ -199,13 +199,16 @@ export class ConverseComponent {
   async send() {
     if (!this.microphoneText && !this.currentMessage.text)
       return;
+    this.currentMessage.isFinal = true;
+    this.translateMessage(this.currentMessage);
+    this.throttle = new myThrottle(500);
     this.messageHistory.push(this.currentMessage);
-    this.throttle.DoIt();
     localStorage.setItem(this.storageKey, JSON.stringify(this.messageHistory));
     this.currentMessage = Object.assign({}, this.currentMessage);
     this.currentMessage.text = '';
     this.currentMessage.translatedText = '';
     this.currentMessage.id = undefined;
+    this.currentMessage.isFinal = false;
     if (this.recording) {
       this.startRecording();
       this.startRecording();
@@ -215,7 +218,7 @@ export class ConverseComponent {
   }
 
   messageHistory: Message[] = [];
-
+  lastPlayedId = -1;
   title = 'chat-translate';
   eventSource: any;/*EventSource*/
   refreshEventListener(enable: boolean) {
@@ -224,7 +227,7 @@ export class ConverseComponent {
       let EventSource: any = window['EventSource'];
       if (enable && typeof (EventSource) !== "undefined") {
         this.zone.run(() => {
-          console.log('registering to stream');
+
           var source = new EventSource('/api/stream', { withCredentials: true });
           if (this.eventSource) {
             this.eventSource.close();
@@ -238,12 +241,29 @@ export class ConverseComponent {
               if (message.id == this.currentMessage.id) {
                 this.currentMessage.translatedText = message.translatedText;
               } else {
+                //console.log(message);
                 let i = this.messageHistory.findIndex(x => x.id == message.id);
-                if (i >= 0) {
-                  this.messageHistory.splice(i, 1);
-                }
+                if (i < 0 || !this.messageHistory[i].isFinal || message.isFinal) {
+                  if (i >= 0) {
+                    this.messageHistory.splice(i, 1);
+                  }
 
-                this.messageHistory.push(message);
+                  this.messageHistory.push(message);
+
+                }
+                if (message.isFinal && this.lastPlayedId != message.id&&this.playTranslation) {
+                  this.lastPlayedId = message.id;
+                  try {
+
+                    let s = new SpeechSynthesisUtterance();
+                    s.lang = message.toLanguage;
+                    s.text = message.translatedText;
+                    window.speechSynthesis.speak(s);
+                  }
+                  catch (err) {
+                    console.error(err);
+                  }
+                }
               }
               localStorage.setItem(this.storageKey, JSON.stringify(this.messageHistory));
 
@@ -251,6 +271,7 @@ export class ConverseComponent {
           };
           let x = this;
           source.addEventListener("authenticate", async function (e) {
+            console.log('registering to stream', x.currentMessage.conversation, e.data);
             x.http.post('/api/authenticate', { key: ((<any>e).data.toString()), conversation: x.currentMessage.conversation }).toPromise().then(() => { });
 
           });
@@ -268,6 +289,10 @@ export class ConverseComponent {
   }
   getShortInviteUrl() {
     return document.location.host + '/' + this.currentMessage.conversation;
+  }
+  playTranslation: boolean = false;
+  speak() {
+    this.playTranslation = true;
   }
 }
 
