@@ -1,7 +1,9 @@
 <div class="container">
     <div>
-        your name: <input [(ngModel)]="currentMessage.userName">,Use this url to join: <strong>
-            {{getInviteUrl()}}</strong>
+        <mat-form-field>
+            <input matInput [(ngModel)]="currentMessage.userName" placeholder="Enter your name">
+        </mat-form-field>
+        ,Use this url to join: <strong>{{getInviteUrl()}}</strong>
     </div>
     <div class="chat-history-div" style="flex-grow: 1000;border-top:1px;
     border-top-style:solid;
