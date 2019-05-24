@@ -10,9 +10,9 @@
     <div id="chat-history" class="chat-history-div" style="border-bottom:1px;
     border-bottom-style:solid;
     border-color:gray;">
-        <div *ngFor="let m of messageHistory" class="message-line" [style.text-align]="messageAlign(m)">
+        <div *ngFor="let m of messageHistory;let i = index;" class="message-line" [style.text-align]="messageAlign(m)">
             <div class="message-text">
-                <span style="font-size: small">{{m.userName}}:</span><br>
+                <span style="font-size: small" *ngIf="showMessageName(m,i)">{{m.userName}}:<br></span>
                 <div>
                     <div class="bubble-part">{{m.text}}</div>
                     <div class="bubble-part" class="current-translated">{{m.translatedText}}</div>

@@ -24,7 +24,7 @@ export class GuestComponent implements OnInit {
 
     let info = <any>(await this.http.get('api/info?id=' + this.currentRoute.snapshot.paramMap.get('id')).toPromise());
     if (info) {
-      console.log(info);
+      info.username = this.username;
       this.converse.init(info,false);
       this.hide = !this.hide;
     }

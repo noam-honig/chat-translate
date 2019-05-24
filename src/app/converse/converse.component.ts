@@ -9,15 +9,15 @@ import { ConversationInfoService } from '../conversation-info.service';
   templateUrl: './converse.component.html',
   styleUrls: ['./converse.component.scss']
 })
-export class ConverseComponent  {
+export class ConverseComponent {
   storageKey = new Date().toDateString();
 
 
 
 
   webkitSpeechRecognitionTypeForNew: any;
-  async init(info:ConversationInfo,host?:boolean) {
-    
+  async init(info: ConversationInfo, host?: boolean) {
+
     this.currentMessage.fromLanguage = info.guestLanguage;
     this.currentMessage.toLanguage = info.hostLanguage;
     this.currentMessage.conversation = info.id;
@@ -143,7 +143,7 @@ export class ConverseComponent  {
 
 
   @ViewChild('theArea') theArea;
-  currentMessage: Message = { text: '', translatedText: '', id: undefined, userName: undefined, presenter: undefined, fromLanguage: undefined, toLanguage: undefined ,conversation:undefined};
+  currentMessage: Message = { text: '', translatedText: '', id: undefined, userName: undefined, presenter: undefined, fromLanguage: undefined, toLanguage: undefined, conversation: undefined };
   throttle = new myThrottle(500);
   async textChanging() {
 
@@ -251,18 +251,23 @@ export class ConverseComponent  {
           };
           let x = this;
           source.addEventListener("authenticate", async function (e) {
-            x.http.post('/api/authenticate', { key: ((<any>e).data.toString()),conversation:x.currentMessage.conversation }).toPromise().then(() => { });
+            x.http.post('/api/authenticate', { key: ((<any>e).data.toString()), conversation: x.currentMessage.conversation }).toPromise().then(() => { });
 
           });
         });
       }
     }
   }
+  showMessageName(m: Message, i: number) {
+    if (i == 0)
+      return true;
+    return m.userName != this.messageHistory[i - 1].userName;
+  }
   getInviteUrl() {
-    return document.location.origin+'/'+this.currentMessage.conversation;
+    return document.location.origin + '/' + this.currentMessage.conversation;
   }
   getShortInviteUrl() {
-    return document.location.host+'/'+this.currentMessage.conversation;
+    return document.location.host + '/' + this.currentMessage.conversation;
   }
 }
 
