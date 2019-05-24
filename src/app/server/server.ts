@@ -131,7 +131,11 @@ app.post('/api/test', async (req, result) => {
             let x = theBody.data;
             if (x)
                 message.translatedText = x.translations[0].translatedText;
-            else console.error(theBody, err);
+            else {
+                console.error(theBody, err);
+
+                message.translatedText = message.text;
+            };
 
             let c = activeConversations.get(message.conversation);
             if (!c) {
@@ -158,7 +162,7 @@ app.post('/api/test', async (req, result) => {
 
 
 });
-app.all('/*', function(req, res, next) {
+app.all('/*', function (req, res, next) {
     // Just send the index.html for other files to support HTML5Mode
     res.sendFile('index.html', { root: "dist/chat-translate" });
 });
