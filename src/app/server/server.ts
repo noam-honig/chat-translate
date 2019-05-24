@@ -12,15 +12,6 @@ import * as https from 'https';
 import * as request from 'request';
 
 
-let text = 'hello world';
-let target = "ru";
-let source = "en";
-
-
-
-
-
-
 config();
 let app = express();
 let port = process.env.PORT || 3000;
@@ -82,18 +73,19 @@ app.get('/api/lang', (req, res) => {
 app.post('/api/test', async (req, result) => {
     let message: Message = req.body.message;
 
-    let source = translationLanguage;
-    let target = "en";
-    if (message.isEnglish) {
-        target = source;
-        source = 'en';
-    }
+
+
+
     try {
-        request("https://www.googleapis.com/language/translate/v2?key=" + process.env.google_key + "&source=" + source + "&target=" + target + "&format=text", {
+        request("https://www.googleapis.com/language/translate/v2?key=" + process.env.google_key + "&source=" + message.fromLanguage + "&target=" + message.toLanguage + "&format=text", {
             method: 'post',
             body: JSON.stringify({ q: message.text })
         }, (err, res, body) => {
-            message.translatedText = JSON.parse(body).data.translations[0].translatedText;
+            let theBody = JSON.parse(body);
+            let x = theBody.data;
+            if (x)
+                message.translatedText = x.translations[0].translatedText;
+            else console.error(theBody,err);
 
 
             connection.forEach(y => y.write("data:" + JSON.stringify(message) + "\n\n"))

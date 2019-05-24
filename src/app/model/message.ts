@@ -3,5 +3,7 @@ export interface Message{
     text:string;
     translatedText:string;
     id:number;
-    isEnglish:boolean;
+    presenter:boolean;
+    fromLanguage:string;
+    toLanguage:string;
 }

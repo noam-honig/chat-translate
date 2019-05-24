@@ -25,7 +25,7 @@
         <div class="bubble-part">
             <textarea #theArea [(ngModel)]="currentMessage.text" (keyup)="textChanging($event)" class="text-input"
                 (keypress)="keyPress($event)"></textarea>
-                {{microphoneText}}
+            {{microphoneText}}
         </div>
         <div class="current-translated bubble-part">{{currentMessage.translatedText}}</div>
     </div>
@@ -33,5 +33,6 @@
         <button (click)="send()">Send </button>
         <button (click)="startRecording()">{{recording?"stop recording":"record" }}</button>
         <span style="font-size: small">(or press [Ctrl]+[Enter] to send)</span>
+        <button (click)="switchLanguage()">{{currentMessage.fromLanguage}} <=> {{currentMessage.toLanguage}} </button>
     </div>
 </div>

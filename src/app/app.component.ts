@@ -9,125 +9,158 @@ import { Message } from './model/message';
 })
 export class AppComponent implements OnInit {
   storageKey = new Date().toDateString();
-  microphoneLang: string;
+
+  languages: [
+    ["English", "en"],
+    ["Spanish", "es"],
+    ["French", "fr"],
+    ["German", "de"],
+    ["Portuguese", "pt"],
+    ["Hungarian","hu"],
+    ["Dutch","nl"],
+    ["Hindi","hi"],
+    ["Italian","it"],
+    ["Japanese","ja"],
+    ["Polish","pl"],
+    ["Hebrew", "he"]];
+
+
+  webkitSpeechRecognitionTypeForNew: any;
   async ngOnInit() {
 
 
     let lang: any = await this.http.get('/api/lang').toPromise();
-    this.microphoneLang = lang.lang;
+    this.currentMessage.fromLanguage = lang.lang;
+    this.currentMessage.toLanguage = 'en';
 
 
     this.refreshEventListener(true);
-    this.currentMessage.isEnglish = document.location.href.toLowerCase().endsWith('en=y')
-    if (this.currentMessage.isEnglish) {
-      this.microphoneLang = 'en-us';
+    this.currentMessage.presenter = document.location.href.toLowerCase().endsWith('en=y')
+    if (this.currentMessage.presenter) {
+      this.switchLanguage();
     }
-    this.currentMessage.userName = this.currentMessage.isEnglish ? "Noam" : "Guest";
+    this.currentMessage.userName = this.currentMessage.presenter ? "Noam" : "Guest";
     let o = new MutationObserver(m => {
       let d = document.getElementById("chat-history");
       d.scrollTop = d.scrollHeight;
     });
     o.observe(document.getElementById("chat-history"), { childList: true });
     let x = localStorage.getItem(this.storageKey);
-    if (x)
+    if (x && false)
       this.messageHistory = JSON.parse(x);
     if (!('webkitSpeechRecognition' in window)) {
 
     } else {
-      const webkitSpeechRecognition: any = window['webkitSpeechRecognition'];
-      var recognition = new webkitSpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = true;
+      this.webkitSpeechRecognitionTypeForNew = window['webkitSpeechRecognition'];
 
-      recognition.onstart = () => {
-        this.microphoneText = '';
-        this.lastFinalMicrophoneResult = -1;
-      }
-      recognition.onresult = (event) => {
-        let i = 0;
-        let old = '';
-        let newFinalText = '';
-        let interm = '';
-        for (const res of event.results) {
-          let j = 0;
-
-          for (const alt of res) {
-            if (res.isFinal) {
-              if (i > this.lastFinalMicrophoneResult) {
-                newFinalText += alt.transcript;
-                this.lastFinalMicrophoneResult = i;
-              } else {
-                old += alt.transcript;
-              }
-            }
-            else
-              interm += alt.transcript;//, res.isFinal, i, j++);
-
-          }
-          i++;
-        }
-        console.log({ old, current: newFinalText, interm });
-        this.zone.run(() => {
-          if (newFinalText) {
-            if (this.currentMessage.text)
-              this.currentMessage.text += '\n';
-            this.currentMessage.text += newFinalText.trim();
-
-
-          }
-          this.microphoneText = interm
-          setTimeout(() => {
-            this.textChanging();
-          }, 100);
-
-        });
-
-
-      }
-      recognition.onerror = (event) => {
-        console.log("on error", event);
-      }
-      recognition.onend = () => { this.recording = false };
-      this.doStart = () => {
-        if (!this.recording) {
-          recognition.lang = this.microphoneLang;
-          recognition.start();
-          this.recording = true;
-        }
-        else {
-            recognition.stop();
-            this.recording = false;
-        }
-      };
     }
   }
   microphoneText: string = '';
-  lastFinalMicrophoneResult = -1;
+
   recording = false;
-  doStart: () => void = () => { };
+  stopRecording = () => { };
   startRecording() {
-    this.doStart();
+    if (!this.webkitSpeechRecognitionTypeForNew)
+      return;
+    if (this.recording) {
+      this.stopRecording();
+      return;
+    }
+    let m = this.currentMessage;
+    var recognition = new this.webkitSpeechRecognitionTypeForNew();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    let lastFinalMicrophoneResult = -1;
+    recognition.onstart = () => {
+      this.microphoneText = '';
+      lastFinalMicrophoneResult = -1;
+    }
+    recognition.onresult = (event) => {
+      let i = 0;
+      let old = '';
+      let newFinalText = '';
+      let interm = '';
+      for (const res of event.results) {
+        let j = 0;
+
+        for (const alt of res) {
+          if (res.isFinal) {
+            if (i > lastFinalMicrophoneResult) {
+              newFinalText += alt.transcript;
+              lastFinalMicrophoneResult = i;
+            } else {
+              old += alt.transcript;
+            }
+          }
+          else
+            interm += alt.transcript;
+
+        }
+        i++;
+      }
+      console.log({ old, current: newFinalText, interm, id: m.id });
+      this.zone.run(() => {
+        if (newFinalText) {
+          if (m.text)
+            m.text += '\n';
+          m.text += newFinalText.trim();
+
+
+        }
+        if (this.currentMessage == m)
+          this.microphoneText = interm
+        setTimeout(() => {
+          this.translateMessage(m, interm);
+        }, 100);
+
+      });
+    }
+    recognition.onerror = (event) => {
+      console.log("on error", event);
+    }
+    let stopped = false;
+    recognition.onend = () => {
+      if (!stopped)
+        this.recording = false;
+    };
+    recognition.lang = m.fromLanguage;
+    recognition.start();
+    this.recording = true;
+    console.log("start recording");
+    this.stopRecording = () => {
+      recognition.stop();
+      this.recording = false;
+      stopped = true;
+      console.log("stop recording");
+
+    }
+
+
+
   }
   constructor(private zone: NgZone, private http: HttpClient) {
 
   }
   messageAlign(m: Message) {
-    if (!m.isEnglish)
+    if (!m.presenter)
       return 'end';
     return '';
   }
 
 
   @ViewChild('theArea') theArea;
-  currentMessage: Message = { text: '', translatedText: '', id: undefined, userName: undefined, isEnglish: undefined };
+  currentMessage: Message = { text: '', translatedText: '', id: undefined, userName: undefined, presenter: undefined, fromLanguage: undefined, toLanguage: undefined };
   throttle = new myThrottle(500);
   async textChanging() {
 
     this.resizeTextArea();
+    this.translateMessage(this.currentMessage);
 
-    let m = this.currentMessage;
 
-    if (m.text || this.microphoneText) {
+
+  }
+  translateMessage(m: Message, additionalText?: string) {
+    if (m.text || additionalText) {
       this.throttle.do(async () => {
         if (!m.id) {
           let x: any = await this.http.get('/api/newId').toPromise();
@@ -135,10 +168,10 @@ export class AppComponent implements OnInit {
             m.id = x.id;
         }
         m = Object.assign({}, m);
-        if (this.microphoneText) {
+        if (additionalText) {
           if (m.text)
             m.text += '\n';
-          m.text += this.microphoneText;
+          m.text += additionalText;
         }
         await this.http.post('/api/test', { message: m }).toPromise();
       });
@@ -157,18 +190,33 @@ export class AppComponent implements OnInit {
       this.send();
   }
 
+  switchLanguage() {
+
+    this.send();
+    var temp = this.currentMessage.fromLanguage;
+    this.currentMessage.fromLanguage = this.currentMessage.toLanguage;
+    this.currentMessage.toLanguage = temp;
+    if (this.recording) {
+      this.startRecording();
+      this.startRecording();
+    }
+  }
 
   async send() {
+    if (!this.microphoneText && !this.currentMessage.text)
+      return;
     this.messageHistory.push(this.currentMessage);
     this.throttle.DoIt();
     localStorage.setItem(this.storageKey, JSON.stringify(this.messageHistory));
-    this.currentMessage = {
-      text: '',
-      translatedText: '',
-      userName: this.currentMessage.userName,
-      isEnglish: this.currentMessage.isEnglish,
-      id: undefined
-    };
+    this.currentMessage = Object.assign({}, this.currentMessage);
+    this.currentMessage.text = '';
+    this.currentMessage.translatedText = '';
+    this.currentMessage.id = undefined;
+    if (this.recording) {
+      this.startRecording();
+      this.startRecording();
+    }
+
     this.resizeTextArea();
   }
 
