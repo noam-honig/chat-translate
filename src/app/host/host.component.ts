@@ -15,12 +15,12 @@ export class HostComponent implements OnInit {
 
   ngOnInit() {
     if (!this.currentConversation.info) {
-      var x = sessionStorage.getItem('current');
+      var x = localStorage.getItem('current');
       if (x)
         this.currentConversation.info = JSON.parse(x);
     }
     if (this.currentConversation.info) {
-      sessionStorage.setItem('current', JSON.stringify(this.currentConversation.info));
+      localStorage.setItem('current', JSON.stringify(this.currentConversation.info));
       this.converse.init(this.currentConversation.info, true);
     }
     else

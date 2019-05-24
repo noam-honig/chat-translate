@@ -19,7 +19,7 @@
         </mat-menu>
     <div class="chat-history-div" style="flex-grow: 1000;"></div>
 
-    <div id="chat-history" class="chat-history-div" style="border-bottom:1px;
+    <div id="chat-history" class="chat-history-div the-actual-chat-history" style="border-bottom:1px;
     border-bottom-style:solid;
     border-color:gray;">
         <div *ngFor="let m of messageHistory;let i = index;" class="message-line" [style.text-align]="messageAlign(m)">

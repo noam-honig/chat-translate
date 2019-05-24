@@ -37,8 +37,8 @@ export class ConverseComponent {
     o.observe(document.getElementById("chat-history"), { childList: true });
 
 
-    let x = localStorage.getItem(this.storageKey);
-    if (x && false)
+    let x = localStorage.getItem(this.currentMessage.conversation);
+    if (x && this.currentMessage.presenter)
       this.messageHistory = JSON.parse(x);
 
 
@@ -214,7 +214,7 @@ export class ConverseComponent {
     this.translateMessage(this.currentMessage);
     this.throttle = new myThrottle(500);
     this.messageHistory.push(this.currentMessage);
-    localStorage.setItem(this.storageKey, JSON.stringify(this.messageHistory));
+    
     this.currentMessage = Object.assign({}, this.currentMessage);
     this.currentMessage.text = '';
     this.currentMessage.translatedText = '';
@@ -267,7 +267,7 @@ export class ConverseComponent {
                   this.doSpeak(message);
                 }
               }
-              localStorage.setItem(this.storageKey, JSON.stringify(this.messageHistory));
+              localStorage.setItem(this.currentMessage.conversation, JSON.stringify(this.messageHistory));
 
             });
           };

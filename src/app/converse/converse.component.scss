@@ -26,6 +26,8 @@
   flex-grow: 1;
   overflow-y: auto;
   align-items: flex-end;
+}
+.the-actual-chat-history {
   background-image: url(/assets/google-translate-logo.png);
   background-repeat: no-repeat;
   background-position: bottom right;
@@ -35,7 +37,6 @@
   display: flex;
   flex-direction: column;
   background-color: #efefef;
-  
 }
 .interm-microphone-text {
   color: gray;
