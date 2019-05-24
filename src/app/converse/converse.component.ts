@@ -46,6 +46,7 @@ export class ConverseComponent {
 
     } else {
       this.webkitSpeechRecognitionTypeForNew = window['webkitSpeechRecognition'];
+      this.canRecord = true;
 
     }
     setTimeout(() => {
@@ -54,6 +55,8 @@ export class ConverseComponent {
     }, 100);
 
   }
+  canRecord= false;
+  
   microphoneText: string = '';
 
   recording = false;

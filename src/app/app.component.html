@@ -1,2 +1,9 @@
 
-<router-outlet></router-outlet>
+<div *ngIf="problem">
+<h1 >Browser not supported</h1>
+We are sorry but the browser you are using does not support server sent events.<br>
+
+<br>
+Please try Chrome or Safari
+</div>
+<router-outlet *ngIf="!problem"></router-outlet>

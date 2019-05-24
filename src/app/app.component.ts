@@ -7,5 +7,11 @@ import { Message, ConversationInfo } from './model/message';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent  {
+export class AppComponent {
+  problem = false;
+  constructor() {
+    if (typeof (EventSource) == "undefined") {
+      this.problem = true;
+    }
   }
+}

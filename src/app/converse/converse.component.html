@@ -59,8 +59,8 @@
                 matTooltip="Click me to send the message, you can also click Ctrl Enter to send">
                 <mat-icon>send</mat-icon>
             </button>
-            <button mat-icon-button (click)="toggleRecording()" [class.pressed]="recording"
-                matTooltip="Click me to enable the microphone and speach to text">
+            <button mat-icon-button *ngIf="canRecord" (click)="toggleRecording()" [class.pressed]="recording"
+                matTooltip="Click me to enable the microphone and speach to text" >
                 <mat-icon>mic</mat-icon>
             </button>
         </div>
