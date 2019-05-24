@@ -1,43 +1,69 @@
 <div class="container">
     <div class="title-bar">
-        Link to join: <a [attr.href]="getInviteUrl()" target="_blank">{{getShortInviteUrl()}}</a>
-       
+        <div> Link to join: <a [attr.href]="getInviteUrl()" target="_blank">{{getShortInviteUrl()}}</a></div>
+        <button mat-icon-button [matMenuTriggerFor]="menu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+     
     </div>
+    <mat-menu #menu="matMenu">
+            <button mat-menu-item [class.pressed]="playTranslation"(click)="toggleAutoSpeak()">
+                <mat-icon [class.pressed]="playTranslation">volume_up</mat-icon>
+                <span>Auto play translation</span>
+            </button>
+            <button mat-menu-item  (click)="switchLanguage()">
+                
+                <span>{{currentMessage.fromLanguage}} <mat-icon>swap_horiz</mat-icon> {{currentMessage.toLanguage}}</span>
+            </button>
+           
+        </mat-menu>
     <div class="chat-history-div" style="flex-grow: 1000;"></div>
 
     <div id="chat-history" class="chat-history-div" style="border-bottom:1px;
     border-bottom-style:solid;
     border-color:gray;">
-        <div *ngFor="let m of messageHistory;let i = index;" class="message-line"  [style.text-align]="messageAlign(m)">
+        <div *ngFor="let m of messageHistory;let i = index;" class="message-line" [style.text-align]="messageAlign(m)">
             <div class="message-text" [class.other-message]="!m.presenter">
                 <span style="font-size: small" *ngIf="showMessageName(m,i)">{{m.userName}}:<br></span>
                 <div>
                     <div class="bubble-part">{{m.text}}</div>
-                    <div class="bubble-part" class="current-translated">{{m.translatedText}}  <button style="color:gray;float:right;" mat-icon-button (click)="doSpeak(m)" *ngIf="m.translatedText" [class.pressed]="playTranslation" matTooltip="Click me to hear the translated text"><mat-icon >volume_up</mat-icon></button> </div>
+                    <div class="bubble-part" class="current-translated">{{m.translatedText}} <button
+                            style="color:gray;float:right;" mat-icon-button (click)="doSpeak(m)"
+                            *ngIf="m.translatedText" [class.pressed]="playTranslation"
+                            matTooltip="Click me to hear the translated text">
+                            <mat-icon>volume_up</mat-icon>
+                        </button> </div>
                 </div>
             </div>
         </div>
 
-    </div> 
-    <div style="display:flex;" >
-    <div class="message-text">
-        <div class="bubble-part">
-            <textarea #theArea [(ngModel)]="currentMessage.text" (keyup)="textChanging()" class="text-input" placeholder="Type a message"
-                (keypress)="keyPress($event)" mat-focus></textarea>
-            <span class="interm-microphone-text">{{microphoneText}}</span>
+    </div>
+    <div style="display:flex;align-items: center">
+        <div class="message-text">
+            <div class="bubble-part">
+                <textarea #theArea [(ngModel)]="currentMessage.text" (keyup)="textChanging()" class="text-input"
+                    placeholder="Type a message" (keypress)="keyPress($event)" mat-focus></textarea>
+                <span class="interm-microphone-text">{{microphoneText}}</span>
+            </div>
+            <div class="current-translated bubble-part">{{currentMessage.translatedText}} <button
+                    style="color:gray;float:right;" mat-icon-button (click)="doSpeak(currentMessage)"
+                    *ngIf="currentMessage.translatedText" [class.pressed]="playTranslation"
+                    matTooltip="Click me to hear the translated text">
+                    
+                    <mat-icon>volume_up</mat-icon>
+                </button></div>
+
         </div>
-        <div class="current-translated bubble-part">{{currentMessage.translatedText}} <button style="color:gray;float:right;" mat-icon-button (click)="doSpeak(currentMessage)" *ngIf="currentMessage.translatedText" [class.pressed]="playTranslation" matTooltip="Click me to hear the translated text"><mat-icon >volume_up</mat-icon></button></div>
-        
+        <div style="color:gray;display:inline;">
+            <button mat-icon-button (click)="send()"
+                matTooltip="Click me to send the message, you can also click Ctrl Enter to send">
+                <mat-icon>send</mat-icon>
+            </button>
+            <button mat-icon-button (click)="toggleRecording()" [class.pressed]="recording"
+                matTooltip="Click me to enable the microphone and speach to text">
+                <mat-icon>mic</mat-icon>
+            </button>
+        </div>
     </div>
-    <div style="color:gray;display:inline;">
-            <button mat-icon-button (click)="send()"  matTooltip="Click me to send the message, you can also click Ctrl Enter to send"><mat-icon >send</mat-icon> </button>
-            <button mat-icon-button (click)="toggleRecording()" [class.pressed]="recording"  matTooltip="Click me to enable the microphone and speach to text"><mat-icon >mic</mat-icon></button>
-    </div>
-</div>
-    <div>
-        
-        <span style="font-size: small">(or press [Ctrl]+[Enter] to send)</span>
-        <button mat-button (click)="switchLanguage()">{{currentMessage.fromLanguage}} <=> {{currentMessage.toLanguage}} </button>
-        
-    </div>
+    
 </div>

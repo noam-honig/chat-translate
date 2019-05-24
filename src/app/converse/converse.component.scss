@@ -8,11 +8,15 @@
   font-weight: 400;
   font-size: 19px;
   line-height: 1.2em;
-  height:1.2em;
+  height: 1.2em;
   resize: none;
 }
 .title-bar {
   background-color: #e5ddd5;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
 }
 .other-message {
   background-color: #dcf8c6 !important;
@@ -22,15 +26,19 @@
   flex-grow: 1;
   overflow-y: auto;
   align-items: flex-end;
+  background-image: url(/assets/google-translate-logo.png);
+  background-repeat: no-repeat;
+  background-position: bottom right;
 }
 .container {
   height: 100%;
   display: flex;
   flex-direction: column;
   background-color: #efefef;
+  
 }
-.interm-microphone-text{
-    color:gray;
+.interm-microphone-text {
+  color: gray;
 }
 .input-div {
   display: flex;
@@ -64,8 +72,8 @@
   border: 0px;
   border-style: solid;
   margin: -1px;
-  padding-left:3px;
-  margin-left:-3px;
+  padding-left: 3px;
+  margin-left: -3px;
 
   height: 100%;
 }
@@ -89,5 +97,5 @@
   }
 }
 .pressed {
-  color: red;
+  color: red !important;
 }

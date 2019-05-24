@@ -314,7 +314,7 @@ export class ConverseComponent {
     return document.location.host + '/' + this.currentMessage.conversation;
   }
   playTranslation: boolean = false;
-  speak() {
+  toggleAutoSpeak() {
     this.playTranslation = !this.playTranslation;
   }
 }
