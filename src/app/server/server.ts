@@ -158,6 +158,9 @@ app.post('/api/test', async (req, result) => {
 
 
 });
-
+app.all('/*', function(req, res, next) {
+    // Just send the index.html for other files to support HTML5Mode
+    res.sendFile('index.html', { root: "dist/chat-translate" });
+});
 app.listen(port);
 console.log("Listening on port: " + port);
