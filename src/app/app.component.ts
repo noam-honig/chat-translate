@@ -16,12 +16,12 @@ export class AppComponent implements OnInit {
     ["French", "fr"],
     ["German", "de"],
     ["Portuguese", "pt"],
-    ["Hungarian","hu"],
-    ["Dutch","nl"],
-    ["Hindi","hi"],
-    ["Italian","it"],
-    ["Japanese","ja"],
-    ["Polish","pl"],
+    ["Hungarian", "hu"],
+    ["Dutch", "nl"],
+    ["Hindi", "hi"],
+    ["Italian", "it"],
+    ["Japanese", "ja"],
+    ["Polish", "pl"],
     ["Hebrew", "he"]];
 
 
@@ -32,22 +32,27 @@ export class AppComponent implements OnInit {
     let lang: any = await this.http.get('/api/lang').toPromise();
     this.currentMessage.fromLanguage = lang.lang;
     this.currentMessage.toLanguage = 'en';
-
-
-    this.refreshEventListener(true);
     this.currentMessage.presenter = document.location.href.toLowerCase().endsWith('en=y')
     if (this.currentMessage.presenter) {
       this.switchLanguage();
     }
     this.currentMessage.userName = this.currentMessage.presenter ? "Noam" : "Guest";
+
+
+    this.refreshEventListener(true);
+
     let o = new MutationObserver(m => {
       let d = document.getElementById("chat-history");
       d.scrollTop = d.scrollHeight;
     });
     o.observe(document.getElementById("chat-history"), { childList: true });
+
+
     let x = localStorage.getItem(this.storageKey);
     if (x && false)
       this.messageHistory = JSON.parse(x);
+
+
     if (!('webkitSpeechRecognition' in window)) {
 
     } else {
