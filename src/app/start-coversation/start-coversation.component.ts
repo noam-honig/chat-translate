@@ -31,6 +31,7 @@ export class StartCoversationComponent implements OnInit {
     ["Italian", "it"],
     ["Japanese", "ja"],
     ["Polish", "pl"],
+    ["Chinese","zh"],
     ["Hebrew", "he"]];
   constructor(private http: HttpClient, private conversation: ConversationInfoService,
     private router: Router) { }
