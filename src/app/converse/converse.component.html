@@ -15,7 +15,7 @@
             </button>
             <button mat-menu-item  (click)="switchLanguage()">
                 
-                <span>{{currentMessage.fromLanguage}} <mat-icon>swap_horiz</mat-icon> {{currentMessage.toLanguage}}</span>
+                <span>{{langHelper.getName( currentMessage.fromLanguage)}} <mat-icon>swap_horiz</mat-icon> {{langHelper.getName( currentMessage.toLanguage)}}</span>
             </button>
             <button mat-menu-item (click)="newConversation()">
                     <mat-icon >create</mat-icon>
@@ -35,7 +35,7 @@
                     <div class="bubble-part">{{m.text}}</div>
                     <div class="bubble-part" class="current-translated">{{m.translatedText}} <button
                             style="color:gray;float:right;" mat-icon-button (click)="doSpeak(m)"
-                            *ngIf="m.translatedText" [class.pressed]="playTranslation"
+                            *ngIf="m.translatedText" 
                             matTooltip="Click me to hear the translated text">
                             <mat-icon>volume_up</mat-icon>
                         </button> </div>
@@ -48,12 +48,12 @@
         <div class="message-text">
             <div class="bubble-part">
                 <textarea #theArea [(ngModel)]="currentMessage.text" (input)="textChanging()" class="text-input" 
-                    placeholder="Type a message" (keypress)="keyPress($event)" mat-focus></textarea>
+                    placeholder="{{getTextPlaceHolder()}}" (keypress)="keyPress($event)" mat-focus></textarea>
                 <span class="interm-microphone-text">{{microphoneText}}</span>
             </div>
             <div class="current-translated bubble-part">{{currentMessage.translatedText}} <button
                     style="color:gray;float:right;" mat-icon-button (click)="doSpeak(currentMessage)"
-                    *ngIf="currentMessage.translatedText" [class.pressed]="playTranslation"
+                    *ngIf="currentMessage.translatedText" 
                     matTooltip="Click me to hear the translated text">
                     
                     <mat-icon>volume_up</mat-icon>

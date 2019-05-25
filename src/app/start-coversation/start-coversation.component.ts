@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { ConversationInfoService } from '../conversation-info.service';
 import { Router } from '@angular/router';
 import { storage } from '../storage';
+import { Language } from '../model/Languages';
 
 
 @Component({
@@ -19,20 +20,7 @@ export class StartCoversationComponent implements OnInit {
     guestLanguage: "es",
     id: undefined
   };
-  languages = [
-    ["English", "en"],
-    ["Spanish", "es"],
-    ["French", "fr"],
-    ["German", "de"],
-    ["Portuguese", "pt"],
-    ["Hungarian", "hu"],
-    ["Dutch", "nl"],
-    ["Hindi", "hi"],
-    ["Italian", "it"],
-    ["Japanese", "ja"],
-    ["Polish", "pl"],
-    ["Chinese","zh"],
-    ["Hebrew", "he"]];
+  languages = Language.languages;
   constructor(private http: HttpClient, private conversation: ConversationInfoService,
     private router: Router) { }
   

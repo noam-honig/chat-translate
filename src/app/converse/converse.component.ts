@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { ConversationInfoService } from '../conversation-info.service';
 import { Router } from '@angular/router';
 import * as copy from 'copy-to-clipboard';
+import { Language } from '../model/Languages';
 
 @Component({
   selector: 'app-converse',
@@ -16,7 +17,10 @@ export class ConverseComponent {
   copyJoinLink() {
     copy(this.getShortInviteUrl());
   }
-
+  getTextPlaceHolder() {
+    return "Type a message in " + Language.getName(this.currentMessage.fromLanguage);
+  }
+  langHelper = Language;
 
   newConversation() {
     this.router.navigate(["/"]);
