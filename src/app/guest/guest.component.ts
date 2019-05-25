@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ConverseComponent } from '../converse/converse.component';
 import { ConversationInfo } from '../model/message';
 import { storage } from '../storage';
+import { analytics } from '../utils/analytics';
 
 @Component({
   selector: 'app-guest',
@@ -31,6 +32,7 @@ export class GuestComponent implements OnInit {
     try {
       let info: ConversationInfo = <any>(await this.http.get('api/info?id=' + this.currentRoute.snapshot.paramMap.get('id')).toPromise());
       if (info && info.hostLanguage) {
+        analytics("conversation","guest-"+info.hostLanguage+"-"+info.guestLanguage);
         let x = storage.userDefaults.get();
         if (!x) {
           x = info;

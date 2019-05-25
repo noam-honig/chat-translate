@@ -6,6 +6,8 @@ import { ConversationInfoService } from '../conversation-info.service';
 import { Router } from '@angular/router';
 import * as copy from 'copy-to-clipboard';
 import { Language } from '../model/Languages';
+import { analytics } from '../utils/analytics';
+
 
 @Component({
   selector: 'app-converse',
@@ -26,11 +28,12 @@ export class ConverseComponent {
     return "Type a message in " + Language.getName(this.currentMessage.fromLanguage);
   }
   langHelper = Language;
-  
+
 
   newConversation() {
     this.router.navigate(["/"]);
   }
+
   webkitSpeechRecognitionTypeForNew: any;
   async init(info: ConversationInfo, host?: boolean) {
 
@@ -77,6 +80,11 @@ export class ConverseComponent {
 
   recording = false;
   stopRecording = () => { };
+  clickToggleRecording() {
+
+    this.toggleRecording();
+    analytics("speech-to-text",this.currentMessage.fromLanguage + "-" + this.currentMessage.toLanguage+" "+(this.recording?"on":"off"));
+  }
   toggleRecording() {
     if (!this.webkitSpeechRecognitionTypeForNew)
       return;
@@ -192,6 +200,7 @@ export class ConverseComponent {
             m.text += '\n';
           m.text += additionalText;
         }
+        analytics("message","translate-" + m.fromLanguage + "-" + m.toLanguage);
         await this.http.post('/api/test', { message: m }).toPromise();
       });
     }
@@ -226,6 +235,7 @@ export class ConverseComponent {
   async send() {
     if (!this.microphoneText && !this.currentMessage.text)
       return;
+    analytics("message","send-" + this.currentMessage.fromLanguage + "-" + this.currentMessage.toLanguage);
     this.currentMessage.isFinal = true;
     this.translateMessage(this.currentMessage);
     this.throttle = new myThrottle(500);
@@ -300,7 +310,7 @@ export class ConverseComponent {
 
   doSpeak(message: Message) {
     try {
-
+      analytics("text-to-speach","play-" + message.fromLanguage + "-" + message.toLanguage);
       let s = new SpeechSynthesisUtterance();
       s.lang = message.toLanguage;
       s.text = message.translatedText;
@@ -334,7 +344,9 @@ export class ConverseComponent {
   }
   playTranslation: boolean = false;
   toggleAutoSpeak() {
+
     this.playTranslation = !this.playTranslation;
+    analytics("text-to-speach","auto-play"+ this.playTranslation?"on":"off" + "-" + this.currentMessage.fromLanguage + "-" + this.currentMessage.toLanguage);
   }
 }
 

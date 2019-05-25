@@ -6,6 +6,8 @@ import { ConversationInfoService } from '../conversation-info.service';
 import { Router } from '@angular/router';
 import { storage } from '../storage';
 import { Language } from '../model/Languages';
+import { analytics } from '../utils/analytics';
+
 
 
 @Component({
@@ -31,6 +33,7 @@ export class StartCoversationComponent implements OnInit {
   }
   async startConversation() {
     this.conversation.info = <any>(await this.http.post('api/start', { info: this.start }).toPromise());
+    analytics("conversation","host-"+this.start.hostLanguage+"-"+this.start.guestLanguage);
     storage.userDefaults.set(this.start);
     this.router.navigate(["/host"]);
   }
