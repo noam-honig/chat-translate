@@ -4,6 +4,8 @@ import { ConversationInfo, } from '../model/message';
 import { HttpClient } from '@angular/common/http';
 import { ConversationInfoService } from '../conversation-info.service';
 import { Router } from '@angular/router';
+import { storage } from '../storage';
+
 
 @Component({
   selector: 'app-start-coversation',
@@ -15,7 +17,7 @@ export class StartCoversationComponent implements OnInit {
     username: "Noam Honig",
     hostLanguage: "en",
     guestLanguage: "es",
-    id:undefined
+    id: undefined
   };
   languages = [
     ["English", "en"],
@@ -32,16 +34,21 @@ export class StartCoversationComponent implements OnInit {
     ["Hebrew", "he"]];
   constructor(private http: HttpClient, private conversation: ConversationInfoService,
     private router: Router) { }
+  
   disableConversation() {
     return this.start.username == '';
+    
 
   }
   async startConversation() {
-    this.conversation.info =<any> (await this.http.post('api/start', { info: this.start }).toPromise());
+    this.conversation.info = <any>(await this.http.post('api/start', { info: this.start }).toPromise());
+    storage.userDefaults.set(this.start);
     this.router.navigate(["/host"]);
   }
 
   ngOnInit() {
+    if (storage.userDefaults.hasVal())
+      this.start = storage.userDefaults.get();
   }
 
 }

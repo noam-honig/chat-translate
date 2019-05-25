@@ -67,7 +67,7 @@ app.post('/api/authenticate', (req, res) => {
     }
 });
 let translationLanguage = 'es';
-let id = 0;
+let id = 1;
 app.get('/api/newId', (req, res) => {
     res.json({ id: id++ });
 });
