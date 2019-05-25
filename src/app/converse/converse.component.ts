@@ -16,11 +16,17 @@ export class ConverseComponent {
   storageKey = new Date().toDateString();
   copyJoinLink() {
     copy(this.getShortInviteUrl());
+    this.linkCopies = true;
+    setTimeout(() => {
+      this.linkCopies = false;
+    }, 5000);
   }
+  linkCopies = false;
   getTextPlaceHolder() {
     return "Type a message in " + Language.getName(this.currentMessage.fromLanguage);
   }
   langHelper = Language;
+  
 
   newConversation() {
     this.router.navigate(["/"]);
