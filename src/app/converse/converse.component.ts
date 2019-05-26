@@ -83,7 +83,7 @@ export class ConverseComponent {
   clickToggleRecording() {
 
     this.toggleRecording();
-    analytics("speech-to-text",this.currentMessage.fromLanguage + "-" + this.currentMessage.toLanguage+" "+(this.recording?"on":"off"));
+    analytics("speech-to-text", this.currentMessage.fromLanguage + "-" + this.currentMessage.toLanguage + " " + (this.recording ? "on" : "off"));
   }
   toggleRecording() {
     if (!this.webkitSpeechRecognitionTypeForNew)
@@ -106,25 +106,33 @@ export class ConverseComponent {
       let old = '';
       let newFinalText = '';
       let interm = '';
-      for (const res of event.results) {
-        let j = 0;
 
-        for (const alt of res) {
-          if (res.isFinal) {
-            if (i > lastFinalMicrophoneResult) {
-              newFinalText += alt.transcript;
-              lastFinalMicrophoneResult = i;
-            } else {
-              old += alt.transcript;
-            }
-          }
-          else
-            interm += alt.transcript;
-
-        }
-        i++;
+      let x = event.results[event.resultIndex];
+      if (x.isFinal) {
+        newFinalText = x[0].transcript;
       }
-      console.log({ old, current: newFinalText, interm, id: m.id },event.results,event);
+      else
+        interm = x[0].transcript;
+
+      /*   for (const res of event.results) {
+           let j = 0;
+   
+           for (const alt of res) {
+             if (res.isFinal) {
+               if (i > lastFinalMicrophoneResult) {
+                 newFinalText += alt.transcript;
+                 lastFinalMicrophoneResult = i;
+               } else {
+                 old += alt.transcript;
+               }
+             }
+             else
+               interm += alt.transcript;
+   
+           }
+           i++;
+         }*/
+      console.log({ old, current: newFinalText, interm, id: m.id }, event.results, event);
       this.zone.run(() => {
         if (newFinalText) {
           if (m.text)
@@ -201,7 +209,7 @@ export class ConverseComponent {
             m.text += '\n';
           m.text += additionalText;
         }
-        analytics("message","translate-" + m.fromLanguage + "-" + m.toLanguage);
+        analytics("message", "translate-" + m.fromLanguage + "-" + m.toLanguage);
         await this.http.post('/api/test', { message: m }).toPromise();
       });
     }
@@ -236,7 +244,7 @@ export class ConverseComponent {
   async send() {
     if (!this.microphoneText && !this.currentMessage.text)
       return;
-    analytics("message","send-" + this.currentMessage.fromLanguage + "-" + this.currentMessage.toLanguage);
+    analytics("message", "send-" + this.currentMessage.fromLanguage + "-" + this.currentMessage.toLanguage);
     this.currentMessage.isFinal = true;
     this.translateMessage(this.currentMessage);
     this.throttle = new myThrottle(500);
@@ -311,7 +319,7 @@ export class ConverseComponent {
 
   doSpeak(message: Message) {
     try {
-      analytics("text-to-speach","play-" + message.fromLanguage + "-" + message.toLanguage);
+      analytics("text-to-speach", "play-" + message.fromLanguage + "-" + message.toLanguage);
       let s = new SpeechSynthesisUtterance();
       s.lang = message.toLanguage;
       s.text = message.translatedText;
@@ -347,7 +355,7 @@ export class ConverseComponent {
   toggleAutoSpeak() {
 
     this.playTranslation = !this.playTranslation;
-    analytics("text-to-speach","auto-play"+ this.playTranslation?"on":"off" + "-" + this.currentMessage.fromLanguage + "-" + this.currentMessage.toLanguage);
+    analytics("text-to-speach", "auto-play" + this.playTranslation ? "on" : "off" + "-" + this.currentMessage.fromLanguage + "-" + this.currentMessage.toLanguage);
   }
 }
 
