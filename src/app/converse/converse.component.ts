@@ -101,14 +101,20 @@ export class ConverseComponent {
       this.microphoneText = '';
       lastFinalMicrophoneResult = -1;
     }
+    let first = true;
+    let supportsNonFinal = false;
     recognition.onresult = (event) => {
       let i = 0;
       let old = '';
       let newFinalText = '';
       let interm = '';
-
+      if (first){
+        if (!event.results[event.resultIndex].isFinal){
+          supportsNonFinal = true;
+        }
+      }
       let x = event.results[event.resultIndex];
-      if (x.isFinal) {
+      if (x.isFinal &&supportsNonFinal ) {
         newFinalText = x[0].transcript;
       }
       else
