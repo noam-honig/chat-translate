@@ -170,6 +170,7 @@ export class ConverseComponent {
             m.text += '\n';
           m.text += this.microphoneText.trim();
         }
+        this.microphoneText = '';
       }
     };
     recognition.lang = m.fromLanguage;
