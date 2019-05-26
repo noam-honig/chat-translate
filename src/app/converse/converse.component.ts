@@ -114,10 +114,9 @@ export class ConverseComponent {
         }
       }
       let x = event.results[event.resultIndex];
-      if (!supportsNonFinal) {
-        newFinalText = x[0].transcript;
-      }
-      else {
+      if (supportsNonFinal) {
+        
+      
 
         for (const res of event.results) {
           let j = 0;
@@ -137,6 +136,9 @@ export class ConverseComponent {
           }
           i++;
         }
+      }
+      else{
+        interm = x[0].transcript;
       }
       console.log({ old, current: newFinalText, interm, id: m.id }, event.results, event);
       this.zone.run(() => {
