@@ -115,8 +115,8 @@ export class ConverseComponent {
       }
       let x = event.results[event.resultIndex];
       if (supportsNonFinal) {
-        
-      
+
+
 
         for (const res of event.results) {
           let j = 0;
@@ -137,7 +137,7 @@ export class ConverseComponent {
           i++;
         }
       }
-      else{
+      else {
         interm = x[0].transcript;
       }
       //console.log({ old, current: newFinalText, interm, id: m.id }, event.results, event);
@@ -160,8 +160,8 @@ export class ConverseComponent {
     }
     recognition.onerror = (event) => {
       console.log("on error", event);
-      if (event.error){
-        alert("Error activating microphone: "+event.error);
+      if (event.error) {
+        // alert("Error activating microphone: "+event.error);
       }
       this.recording = false;
     }
@@ -232,6 +232,7 @@ export class ConverseComponent {
         await this.http.post('/api/test', { message: m }).toPromise();
       });
     }
+    else m.translatedText = '';
   }
 
   private resizeTextArea() {
@@ -261,8 +262,11 @@ export class ConverseComponent {
   }
 
   async send() {
-    if (!this.microphoneText && !this.currentMessage.text)
+    if (!this.microphoneText && !this.currentMessage.text) {
+      this.currentMessage.translatedText = '';
       return;
+    }
+
     analytics("message", "send-" + this.currentMessage.fromLanguage + "-" + this.currentMessage.toLanguage);
     this.currentMessage.isFinal = true;
     this.translateMessage(this.currentMessage);
@@ -278,8 +282,10 @@ export class ConverseComponent {
       this.toggleRecording();
       this.toggleRecording();
     }
+    setTimeout(() => {
 
-    this.resizeTextArea();
+      this.resizeTextArea();
+    }, 100);
   }
 
   messageHistory: Message[] = [];
