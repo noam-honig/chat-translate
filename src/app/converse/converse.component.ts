@@ -124,7 +124,7 @@ export class ConverseComponent {
         }
         i++;
       }
-      console.log({ old, current: newFinalText, interm, id: m.id },event.results);
+      console.log({ old, current: newFinalText, interm, id: m.id },event.results,event);
       this.zone.run(() => {
         if (newFinalText) {
           if (m.text)
