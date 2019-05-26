@@ -1,4 +1,3 @@
-
 <mat-card class="card">
   <mat-card-header>
     <mat-card-title>Start Conversation</mat-card-title>
@@ -18,6 +17,27 @@
         <mat-option *ngFor="let l of languages" value="{{l[1]}}">{{l[0]}}</mat-option>
       </mat-select>
     </mat-form-field>
-    <button mat-raised-button color="primary" [disabled]="disableConversation()" (click)="startConversation()">Start Conversation</button>
+    <button mat-raised-button color="primary" [disabled]="disableConversation()" (click)="startConversation()">Start
+      Conversation</button>
+  </div>
+  <div>
+    <br>
+    Note that this is a pre-alpha product, in a very early stage - so be patient to bugs and errors and mindful of security.
+    <ul>
+      <li>
+        The voice recognition and text to speech are ok - not perfect.
+      </li>
+      <li>
+        The conversation is not stored on any server at this time - it is only stored in the browser that started the
+        converstation local storage.
+      </li>
+      <li>
+        General usage information is gathered using Google Analytics
+      </li>
+      <li>
+        The security of this web site is basic using Https - a hacker with enough motivation might be able to listen in on an ongoing conversation.
+      </li>
+      
+    </ul>
   </div>
 </mat-card>

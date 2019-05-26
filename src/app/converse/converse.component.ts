@@ -140,7 +140,7 @@ export class ConverseComponent {
       else{
         interm = x[0].transcript;
       }
-      console.log({ old, current: newFinalText, interm, id: m.id }, event.results, event);
+      //console.log({ old, current: newFinalText, interm, id: m.id }, event.results, event);
       this.zone.run(() => {
         if (newFinalText) {
           if (m.text)
@@ -160,6 +160,10 @@ export class ConverseComponent {
     }
     recognition.onerror = (event) => {
       console.log("on error", event);
+      if (event.error){
+        alert("Error activating microphone: "+event.error);
+      }
+      this.recording = false;
     }
     let stopped = false;
     recognition.onend = () => {
@@ -174,15 +178,15 @@ export class ConverseComponent {
       }
     };
     recognition.lang = m.fromLanguage;
-    console.log(recognition);
+    //console.log(recognition);
     recognition.start();
     this.recording = true;
-    console.log("start recording");
+    //console.log("start recording");
     this.stopRecording = () => {
       recognition.stop();
       this.recording = false;
       stopped = true;
-      console.log("stop recording");
+      //console.log("stop recording");
 
     }
 
@@ -323,7 +327,7 @@ export class ConverseComponent {
           };
           let x = this;
           source.addEventListener("authenticate", async function (e) {
-            console.log('registering to stream', x.currentMessage.conversation, e.data);
+            //console.log('registering to stream', x.currentMessage.conversation, e.data);
             x.http.post('/api/authenticate', { key: ((<any>e).data.toString()), conversation: x.currentMessage.conversation }).toPromise().then(() => { });
 
           });
