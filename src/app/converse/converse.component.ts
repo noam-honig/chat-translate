@@ -108,36 +108,35 @@ export class ConverseComponent {
       let old = '';
       let newFinalText = '';
       let interm = '';
-      if (first){
-        if (!event.results[event.resultIndex].isFinal){
+      if (first) {
+        if (!event.results[event.resultIndex].isFinal) {
           supportsNonFinal = true;
         }
       }
-      let x = event.results[event.resultIndex];
-      if (x.isFinal &&supportsNonFinal ) {
+      if (!supportsNonFinal) {
         newFinalText = x[0].transcript;
       }
-      else
-        interm = x[0].transcript;
+      else {
 
-      /*   for (const res of event.results) {
-           let j = 0;
-   
-           for (const alt of res) {
-             if (res.isFinal) {
-               if (i > lastFinalMicrophoneResult) {
-                 newFinalText += alt.transcript;
-                 lastFinalMicrophoneResult = i;
-               } else {
-                 old += alt.transcript;
-               }
-             }
-             else
-               interm += alt.transcript;
-   
-           }
-           i++;
-         }*/
+        for (const res of event.results) {
+          let j = 0;
+
+          for (const alt of res) {
+            if (res.isFinal) {
+              if (i > lastFinalMicrophoneResult) {
+                newFinalText += alt.transcript;
+                lastFinalMicrophoneResult = i;
+              } else {
+                old += alt.transcript;
+              }
+            }
+            else
+              interm += alt.transcript;
+
+          }
+          i++;
+        }
+      }
       console.log({ old, current: newFinalText, interm, id: m.id }, event.results, event);
       this.zone.run(() => {
         if (newFinalText) {
@@ -161,8 +160,14 @@ export class ConverseComponent {
     }
     let stopped = false;
     recognition.onend = () => {
-      if (!stopped)
+      if (!stopped) {
         this.recording = false;
+        if (!supportsNonFinal && this.microphoneText) {
+          if (m.text)
+            m.text += '\n';
+          m.text += this.microphoneText.trim();
+        }
+      }
     };
     recognition.lang = m.fromLanguage;
     console.log(recognition);
