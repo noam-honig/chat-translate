@@ -113,6 +113,7 @@ export class ConverseComponent {
           supportsNonFinal = true;
         }
       }
+      let x = event.results[event.resultIndex];
       if (!supportsNonFinal) {
         newFinalText = x[0].transcript;
       }
