@@ -151,6 +151,7 @@ export class ConverseComponent {
         this.recording = false;
     };
     recognition.lang = m.fromLanguage;
+    console.log(recognition);
     recognition.start();
     this.recording = true;
     console.log("start recording");
