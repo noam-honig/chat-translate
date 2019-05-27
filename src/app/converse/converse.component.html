@@ -49,7 +49,7 @@
         </div>
 
     </div>
-    <div style="display:flex;align-items: center">
+    <div >
         <div class="message-text">
             <div class="bubble-part">
                 <textarea #theArea [(ngModel)]="currentMessage.text" (input)="textChanging()" class="text-input"
@@ -64,7 +64,7 @@
                 </button></div>
 
         </div>
-        <div style="color:gray;display:inline;">
+        <div style="color:gray;display:inline-block;width:12%;">
             <button mat-icon-button (click)="send()"
                 matTooltip="Click me to send the message, you can also click Ctrl Enter to send">
                 <mat-icon>send</mat-icon>
