@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import * as copy from 'copy-to-clipboard';
 import { Language } from '../model/Languages';
 import { analytics } from '../utils/analytics';
+import { VoiceRecognition } from './voice-recognition';
 
 
 @Component({
@@ -25,6 +26,8 @@ export class ConverseComponent {
   }
   linkCopies = false;
   getTextPlaceHolder() {
+    if (this.microphoneText)
+    return this.microphoneText;
     return "Type a message in " + Language.getName(this.currentMessage.fromLanguage);
   }
   langHelper = Language;
@@ -34,7 +37,7 @@ export class ConverseComponent {
     this.router.navigate(["/"]);
   }
 
-  webkitSpeechRecognitionTypeForNew: any;
+
   async init(info: ConversationInfo, host?: boolean) {
 
     this.currentMessage.fromLanguage = info.guestLanguage;
@@ -61,135 +64,52 @@ export class ConverseComponent {
       this.messageHistory = JSON.parse(x);
 
 
-    if (!('webkitSpeechRecognition' in window)) {
 
-    } else {
-      this.webkitSpeechRecognitionTypeForNew = window['webkitSpeechRecognition'];
-      this.canRecord = true;
-
-    }
     setTimeout(() => {
       this.theArea.nativeElement.focus();
 
     }, 100);
 
   }
-  canRecord = false;
+  voiceToText = new VoiceRecognition(
+    () => {
+      this.microphoneText = '';
+    },
+    final => {
+      this.zone.run(() => {
+        console.log('final',final);
+        if (this.currentMessage.text)
+          this.currentMessage.text += "\n";
+        this.currentMessage.text += final.trim();
+        setTimeout(() => {
+          this.textChanging();
+        }, 100);
+      });
+    },
+    interm => {
+      this.zone.run(() => {
+        console.log('interm',interm);
+        this.microphoneText = interm;
+        if (interm&&this.currentMessage.text)
+          this.send();
+        setTimeout(() => {
+          this.textChanging();
+        }, 100);
+      });
+    });
+
 
   microphoneText: string = '';
 
-  recording = false;
-  stopRecording = () => { };
+
+
   clickToggleRecording() {
 
     this.toggleRecording();
-    analytics("speech-to-text", this.currentMessage.fromLanguage + "-" + this.currentMessage.toLanguage + " " + (this.recording ? "on" : "off"));
+    analytics("speech-to-text", this.currentMessage.fromLanguage + "-" + this.currentMessage.toLanguage + " " + (this.voiceToText.recording ? "on" : "off"));
   }
   toggleRecording() {
-    if (!this.webkitSpeechRecognitionTypeForNew)
-      return;
-    if (this.recording) {
-      this.stopRecording();
-      return;
-    }
-    let m = this.currentMessage;
-    var recognition = new this.webkitSpeechRecognitionTypeForNew();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    let lastFinalMicrophoneResult = -1;
-    recognition.onstart = () => {
-      this.microphoneText = '';
-      lastFinalMicrophoneResult = -1;
-    }
-    let first = true;
-    let supportsNonFinal = false;
-    recognition.onresult = (event) => {
-      let i = 0;
-      let old = '';
-      let newFinalText = '';
-      let interm = '';
-      if (first) {
-        if (!event.results[event.resultIndex].isFinal) {
-          supportsNonFinal = true;
-        }
-      }
-      let x = event.results[event.resultIndex];
-      if (supportsNonFinal) {
-
-
-
-        for (const res of event.results) {
-          let j = 0;
-
-          for (const alt of res) {
-            if (res.isFinal) {
-              if (i > lastFinalMicrophoneResult) {
-                newFinalText += alt.transcript;
-                lastFinalMicrophoneResult = i;
-              } else {
-                old += alt.transcript;
-              }
-            }
-            else
-              interm += alt.transcript;
-
-          }
-          i++;
-        }
-      }
-      else {
-        interm = x[0].transcript;
-      }
-      //console.log({ old, current: newFinalText, interm, id: m.id }, event.results, event);
-      this.zone.run(() => {
-        if (newFinalText) {
-          if (m.text)
-            m.text += '\n';
-          m.text += newFinalText.trim();
-
-
-        }
-        if (this.currentMessage == m)
-          this.microphoneText = interm
-        setTimeout(() => {
-          this.translateMessage(m, interm);
-          this.resizeTextArea();
-        }, 100);
-
-      });
-    }
-    recognition.onerror = (event) => {
-      console.log("on error", event);
-      if (event.error) {
-        // alert("Error activating microphone: "+event.error);
-      }
-      this.recording = false;
-    }
-    let stopped = false;
-    recognition.onend = () => {
-      if (!stopped) {
-        this.recording = false;
-        if (!supportsNonFinal && this.microphoneText) {
-          if (m.text)
-            m.text += '\n';
-          m.text += this.microphoneText.trim();
-        }
-        this.microphoneText = '';
-      }
-    };
-    recognition.lang = m.fromLanguage;
-    //console.log(recognition);
-    recognition.start();
-    this.recording = true;
-    //console.log("start recording");
-    this.stopRecording = () => {
-      recognition.stop();
-      this.recording = false;
-      stopped = true;
-      //console.log("stop recording");
-
-    }
-
+    this.voiceToText.toggleRecording(this.currentMessage.fromLanguage);
 
 
   }
@@ -255,7 +175,7 @@ export class ConverseComponent {
     var temp = this.currentMessage.fromLanguage;
     this.currentMessage.fromLanguage = this.currentMessage.toLanguage;
     this.currentMessage.toLanguage = temp;
-    if (this.recording) {
+    if (this.voiceToText.recording) {
       this.toggleRecording();
       this.toggleRecording();
     }
@@ -278,10 +198,7 @@ export class ConverseComponent {
     this.currentMessage.translatedText = '';
     this.currentMessage.id = undefined;
     this.currentMessage.isFinal = false;
-    if (this.recording) {
-      this.toggleRecording();
-      this.toggleRecording();
-    }
+
     setTimeout(() => {
 
       this.resizeTextArea();
@@ -348,7 +265,7 @@ export class ConverseComponent {
       let s = new SpeechSynthesisUtterance();
       s.lang = message.toLanguage;
       s.text = message.translatedText;
-      let recording = this.recording;
+      let recording = this.voiceToText.recording;
       if (recording) {
         s.onstart = () => {
           this.toggleRecording();
@@ -422,3 +339,4 @@ export class myThrottle {
   }
 
 }
+

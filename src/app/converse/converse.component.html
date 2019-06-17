@@ -54,7 +54,7 @@
             <div class="bubble-part">
                 <textarea #theArea [(ngModel)]="currentMessage.text" (input)="textChanging()" class="text-input"
                     placeholder="{{getTextPlaceHolder()}}" (keypress)="keyPress($event)" mat-focus></textarea>
-                <span class="interm-microphone-text">{{microphoneText}}</span>
+                
             </div>
             <div class="current-translated bubble-part">{{currentMessage.translatedText}} <button
                     style="color:gray;float:right;" mat-icon-button (click)="doSpeak(currentMessage)"
@@ -69,7 +69,7 @@
                 matTooltip="Click me to send the message, you can also click Ctrl Enter to send">
                 <mat-icon>send</mat-icon>
             </button>
-            <button mat-icon-button *ngIf="canRecord" (click)="clickToggleRecording()" [class.pressed]="recording"
+            <button mat-icon-button *ngIf="voiceToText.canRecord" (click)="clickToggleRecording()" [class.pressed]="voiceToText.recording"
                 matTooltip="Click me to enable the microphone and speach to text">
                 <mat-icon>mic</mat-icon>
             </button>

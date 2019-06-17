@@ -11,6 +11,7 @@ const languages = [
     ["Japanese", "ja"],
     ["Polish", "pl"],
     ["Chinese", "zh"],
+    ["Norwegian","no"],
     ["Hebrew", "he"]];
 
 export const Language = {
