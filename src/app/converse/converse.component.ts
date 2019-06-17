@@ -24,10 +24,11 @@ export class ConverseComponent {
       this.linkCopies = false;
     }, 5000);
   }
+
   linkCopies = false;
   getTextPlaceHolder() {
     if (this.microphoneText)
-    return this.microphoneText;
+      return this.microphoneText;
     return "Type a message in " + Language.getName(this.currentMessage.fromLanguage);
   }
   langHelper = Language;
@@ -77,7 +78,7 @@ export class ConverseComponent {
     },
     final => {
       this.zone.run(() => {
-        console.log('final',final);
+        console.log('final', final);
         if (this.currentMessage.text)
           this.currentMessage.text += "\n";
         this.currentMessage.text += final.trim();
@@ -88,12 +89,13 @@ export class ConverseComponent {
     },
     interm => {
       this.zone.run(() => {
-        console.log('interm',interm);
+        console.log('interm', interm);
         this.microphoneText = interm;
-        if (interm&&this.currentMessage.text)
+        if (interm && this.currentMessage.text)
           this.send();
+        this.translateMessage(this.currentMessage, interm);
         setTimeout(() => {
-          this.textChanging();
+          this.resizeTextArea();
         }, 100);
       });
     });

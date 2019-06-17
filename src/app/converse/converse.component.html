@@ -57,7 +57,7 @@
                 
             </div>
             <div class="current-translated bubble-part">{{currentMessage.translatedText}} <button
-                    style="color:gray;float:right;" mat-icon-button (click)="doSpeak(currentMessage)"
+                    style="color:gray;float:right;width:28px;height: 28px;line-height:28px;" mat-icon-button (click)="doSpeak(currentMessage)"
                     *ngIf="currentMessage.translatedText" matTooltip="Click me to hear the translated text">
 
                     <mat-icon>volume_up</mat-icon>
