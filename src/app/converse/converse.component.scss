@@ -56,6 +56,10 @@
 .message-line {
   white-space: pre-wrap;
 }
+.right-buttons-part{
+  width:80px;
+}
+
 .message-text {
   text-align: left;
   display: inline-block;
@@ -89,6 +93,10 @@
     border-color: lightgray;
     width: 100%;
   }
+  .right-buttons-part{
+    width:40px;
+  }
+  
 }
 
 @media only screen and (min-width: 768px) {
@@ -100,6 +108,21 @@
   .bubble-part {
     width: 50%;
     display: inline-block;
+  }
+  .message-text{
+    width:85%;
+  }
+}
+@media only screen and (min-width: 1100px) {
+
+  .message-text{
+    width:90%;
+  }
+}
+@media only screen and (min-width: 1700px) {
+
+  .message-text{
+    width:93%;
   }
 }
 .pressed {

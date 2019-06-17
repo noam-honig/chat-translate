@@ -78,7 +78,7 @@ export class ConverseComponent {
     },
     final => {
       this.zone.run(() => {
-        console.log('final', final);
+        //console.log('final', final);
         if (this.currentMessage.text)
           this.currentMessage.text += "\n";
         this.currentMessage.text += final.trim();
@@ -89,7 +89,7 @@ export class ConverseComponent {
     },
     interm => {
       this.zone.run(() => {
-        console.log('interm', interm);
+        //console.log('interm', interm);
         this.microphoneText = interm;
         if (interm && this.currentMessage.text)
           this.send();
