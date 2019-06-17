@@ -72,6 +72,7 @@ export class ConverseComponent {
     }, 100);
 
   }
+
   voiceToText = new VoiceRecognition(
     () => {
       this.microphoneText = '';
@@ -84,7 +85,11 @@ export class ConverseComponent {
         this.currentMessage.text += final.trim();
         setTimeout(() => {
           this.textChanging();
+          if (this.playTranslation)
+            this.doSpeak(this.currentMessage);
+          this.lastPlayedId = this.currentMessage.id;
         }, 100);
+
       });
     },
     interm => {
@@ -270,10 +275,14 @@ export class ConverseComponent {
       let recording = this.voiceToText.recording;
       if (recording) {
         s.onstart = () => {
-          this.toggleRecording();
+          this.zone.run(() => {
+            this.toggleRecording();
+          })
         };
         s.onend = () => {
-          this.toggleRecording();
+          this.zone.run(() => {
+            this.toggleRecording();
+          });
         };
 
       }
