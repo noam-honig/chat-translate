@@ -24,6 +24,88 @@ export class ConverseComponent {
       this.linkCopies = false;
     }, 5000);
   }
+  copyTranscriptToWord() {
+    let r = "";
+    for (const i of this.messageHistory) {
+      r += '<tr><td>' + i.text + '</td><td>' + i.translatedText + '</td></tr>';
+    }
+    copy(`
+    <style type="text/css" media="screen">
+    body{
+        font-family: ""Helvetica Neue"",Helvetica,Arial,sans-serif;
+        font-size: 14px;
+        line-height: 1.42857143;
+        color: #333;
+        background-color: #fff;
+    }
+    table{
+        border-spacing: 0;
+        border-collapse: collapse;
+        
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        min-height: .01%;
+        overflow-x: auto;
+    }
+    th {
+        text-align: left;
+    
+    }
+    pre{
+        color: #393A34;
+        font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
+        direction: ltr;
+        text-align: left;
+        white-space: pre;
+        word-spacing: normal;
+        word-break: normal;
+        font-size: 0.95em;
+        line-height: 1.2em;
+        -moz-tab-size: 4;
+        -o-tab-size: 4;
+        tab-size: 4;
+        -webkit-hyphens: none;
+        -moz-hyphens: none;
+        -ms-hyphens: none;
+        hyphens: none;
+        padding: 1em;
+        margin: .5em 0;
+        overflow: auto;
+        border: 1px solid #dddddd;
+        background-color: white;
+        background: #fff;
+    }
+    td,th{
+        padding:5px;
+        font-size:14px;
+    }
+    
+    table tr:nth-of-type(odd) {
+        background-color: #f9f9f9;
+    }
+    .h1, h1 {
+        font-size: 36px;
+    }
+    .h1, .h2, .h3, h1, h2, h3 {
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+        font-family: inherit;
+        font-weight: 500;
+        line-height: 1.1;
+        color: inherit;
+    }
+    
+    
+    </style>
+    
+    <table>` + r + '</table>',{
+      format:"text/html",
+      message:"copying",
+      debug:true
+    })
+  }
 
   linkCopies = false;
   getTextPlaceHolder() {
