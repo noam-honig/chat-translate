@@ -25,9 +25,14 @@ export class ConverseComponent {
     }, 5000);
   }
   copyTranscriptToWord() {
+    let prevTalker = '';
     let r = "";
     for (const i of this.messageHistory) {
-      r += '<tr><td>' + i.text + '</td><td>' + i.translatedText + '</td></tr>';
+      if (prevTalker != i.userName) {
+        r += "<tr><td colspan=2><strong>"+encodeHtml(i.userName) + ":</strong></td></tr>";
+        prevTalker = i.userName;
+      }
+      r += '<tr><td>' + encodeHtml(i.text) + '</td><td>' + encodeHtml(i.translatedText) + '</td></tr>';
     }
     copy(`
     <style type="text/css" media="screen">
@@ -100,11 +105,11 @@ export class ConverseComponent {
     
     </style>
     
-    <table>` + r + '</table>',{
-      format:"text/html",
-      message:"copying",
-      debug:true
-    })
+    <table>` + r + '</table>', {
+        format: "text/html",
+        message: "copying",
+        debug: true
+      })
   }
 
   linkCopies = false;
@@ -113,6 +118,7 @@ export class ConverseComponent {
       return this.microphoneText;
     return "Type a message in " + Language.getName(this.currentMessage.fromLanguage);
   }
+
   langHelper = Language;
 
 
@@ -436,3 +442,11 @@ export class myThrottle {
 
 }
 
+function encodeHtml(s: string) {
+  return s.replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/\n/g, '<br>');
+
+}
