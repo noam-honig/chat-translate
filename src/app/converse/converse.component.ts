@@ -70,7 +70,10 @@ export class ConverseComponent {
       this.theArea.nativeElement.focus();
 
     }, 100);
-
+    if (!host) {
+      this.currentMessage.text = 'Hi';
+      this.send();
+    }
   }
 
   voiceToText = new VoiceRecognition(
