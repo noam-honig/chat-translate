@@ -393,7 +393,7 @@ export class ConverseComponent {
     return document.location.origin + '/' + this.currentMessage.conversation;
   }
   getShortInviteUrl() {
-    return document.location.host + '/' + this.currentMessage.conversation;
+    return 'https://'+document.location.host + '/' + this.currentMessage.conversation;
   }
   playTranslation: boolean = false;
   toggleAutoSpeak() {
