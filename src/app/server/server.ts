@@ -11,7 +11,6 @@ import * as https from 'https';
 
 import * as request from 'request';
 
-
 config();
 let app = express();
 let port = process.env.PORT || 3000;
