@@ -92,6 +92,8 @@ export class VoiceRecognition {
                 }
                 this.intermResult("");
                 intermText="";
+                console.log('recording stopped automatically, restarting');
+                this.toggleRecording(lang);
             }
         };
         recognition.lang = lang;
