@@ -13,6 +13,8 @@ const languages = [
     ["Chinese", "zh"],
     ["Norwegian","no"],
     ["Serbian","sr"],
+    ["Ukrainian","uk"],
+    ["Russian","ru"],
     ["Hebrew", "he"]];
 
 export const Language = {
