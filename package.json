@@ -44,6 +44,9 @@
     "tslib": "^1.9.0",
     "zone.js": "~0.8.26"
   },
+  "engines": {
+    "node": "14.x"
+  },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.13.0",
     "@angular/cli": "~7.3.5",
