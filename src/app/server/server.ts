@@ -72,7 +72,7 @@ app.get('/api/newId', (req, res) => {
 });
 app.get('/api/lang', (req, res) => {
     if (req.query.set) {
-        translationLanguage = req.query.set;
+        translationLanguage = req.query.set as string;
     }
     res.json({ lang: translationLanguage });
 });
@@ -105,7 +105,7 @@ class ActiveConversation {
     }
 }
 app.get('/api/info', (req, res) => {
-    let id = req.query.id;
+    let id = req.query.id as string;
     res.json(activeConversations.get(id).info);
 });
 app.post('/api/start', (req, res) => {
@@ -126,29 +126,33 @@ app.post('/api/test', async (req, result) => {
             method: 'post',
             body: JSON.stringify({ q: message.text })
         }, (err, res, body) => {
-            let theBody = JSON.parse(body);
-            let x = theBody.data;
-            if (x)
-                message.translatedText = x.translations[0].translatedText;
-            else {
-                console.error(theBody, err);
+            try {
+                let theBody = JSON.parse(undefined);
+                let x = theBody.data;
+                if (x)
+                    message.translatedText = x.translations[0].translatedText;
+                else {
+                    console.error(theBody, err);
 
-                message.translatedText = message.text;
-            };
+                    message.translatedText = message.text;
+                };
 
-            let c = activeConversations.get(message.conversation);
-            if (!c) {
-                activeConversations.set(message.conversation, c = new ActiveConversation({
-                    id: message.conversation, guestLanguage: undefined, hostLanguage: undefined, username: undefined
-                }));
+                let c = activeConversations.get(message.conversation);
+                if (!c) {
+                    activeConversations.set(message.conversation, c = new ActiveConversation({
+                        id: message.conversation, guestLanguage: undefined, hostLanguage: undefined, username: undefined
+                    }));
 
+                }
+                if (message.presenter && !c.info.username) {
+                    c.info.username = message.userName;
+                    c.info.guestLanguage = message.toLanguage;
+                    c.info.hostLanguage = message.fromLanguage;
+                }
+                c.send(message);
+            } catch (err) {
+                console.error(err);
             }
-            if (message.presenter && !c.info.username) {
-                c.info.username = message.userName;
-                c.info.guestLanguage = message.toLanguage;
-                c.info.hostLanguage = message.fromLanguage;
-            }
-            c.send(message);
 
             result.json({ item: '123' });
         });

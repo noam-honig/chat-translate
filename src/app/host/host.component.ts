@@ -3,6 +3,7 @@ import { ConverseComponent } from '../converse/converse.component';
 import { ConversationInfoService } from '../conversation-info.service';
 import { Router } from '@angular/router';
 
+
 @Component({
   selector: 'app-host',
   templateUrl: './host.component.html',
@@ -10,8 +11,8 @@ import { Router } from '@angular/router';
 })
 export class HostComponent implements OnInit {
 
-  @ViewChild("converse") converse: ConverseComponent;
-  constructor(private currentConversation: ConversationInfoService,private router:Router) { }
+  @ViewChild("converse", { static: true }) converse: ConverseComponent;
+  constructor(private currentConversation: ConversationInfoService, private router: Router) { }
 
   ngOnInit() {
     if (!this.currentConversation.info) {

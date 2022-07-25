@@ -3,11 +3,14 @@ import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
 import { Message, ConversationInfo } from '../model/message';
 import { HttpClient } from '@angular/common/http';
 import { ConversationInfoService } from '../conversation-info.service';
-import { Router } from '@angular/router';
+
+
 import * as copy from 'copy-to-clipboard';
 import { Language } from '../model/Languages';
 import { analytics } from '../utils/analytics';
 import { VoiceRecognition } from './voice-recognition';
+import { myThrottle } from './myThrottle';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -29,7 +32,7 @@ export class ConverseComponent {
     let r = "";
     for (const i of this.messageHistory) {
       if (prevTalker != i.userName) {
-        r += "<tr><td colspan=2><strong>"+encodeHtml(i.userName) + ":</strong></td></tr>";
+        r += "<tr><td colspan=2><strong>" + encodeHtml(i.userName) + ":</strong></td></tr>";
         prevTalker = i.userName;
       }
       r += '<tr><td>' + encodeHtml(i.text) + '</td><td>' + encodeHtml(i.translatedText) + '</td></tr>';
@@ -106,10 +109,10 @@ export class ConverseComponent {
     </style>
     
     <table>` + r + '</table>', {
-        format: "text/html",
-        message: "copying",
-        debug: true
-      })
+      format: "text/html",
+      message: "copying",
+      debug: true
+    })
   }
 
   linkCopies = false;
@@ -393,7 +396,7 @@ export class ConverseComponent {
     return document.location.origin + '/' + this.currentMessage.conversation;
   }
   getShortInviteUrl() {
-    return 'https://'+document.location.host + '/' + this.currentMessage.conversation;
+    return 'https://' + document.location.host + '/' + this.currentMessage.conversation;
   }
   playTranslation: boolean = false;
   toggleAutoSpeak() {
@@ -403,44 +406,6 @@ export class ConverseComponent {
   }
 }
 
-
-export class myThrottle {
-  constructor(private ms: number) {
-
-  }
-  lastRun: number = 0;
-
-  runNext: () => void;
-
-  do(what: () => void) {
-    let current = new Date().valueOf();
-    if (this.lastRun + this.ms < current) {
-      this.lastRun = current;
-      what();
-    } else {
-      if (!this.runNext) {
-        this.runNext = what;
-        setTimeout(() => {
-          this.DoIt();
-        }, this.lastRun + this.ms - current);
-      }
-      else this.runNext = what;
-    }
-  }
-
-  public DoIt() {
-    if (this.runNext) {
-      let x = this.runNext;
-      this.runNext = undefined;
-      this.lastRun = new Date().valueOf();
-      x();
-    }
-  }
-
-  ngOnInit() {
-  }
-
-}
 
 function encodeHtml(s: string) {
   return s.replace(/&/g, '&amp;')
