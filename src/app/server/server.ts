@@ -127,7 +127,7 @@ app.post('/api/test', async (req, result) => {
             body: JSON.stringify({ q: message.text })
         }, (err, res, body) => {
             try {
-                let theBody = JSON.parse(undefined);
+                let theBody = JSON.parse(body);
                 let x = theBody.data;
                 if (x)
                     message.translatedText = x.translations[0].translatedText;
